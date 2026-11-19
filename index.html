@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAICOS FARM — Africa Project & Farmer Credit Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--g:#1f8a4c;--g2:#15703c;--gl:#e8f5ee;--ink:#111827;--mut:#6b7280;--line:#e5e7eb;--bg:#f3f4f6;--card:#fff;--red:#dc2626;--redl:#fdecec;--amb:#b45309;--ambl:#fef3c7;--blu:#2563eb;--blul:#e8efff;--pur:#7c3aed;--purl:#f3e8ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:Lato,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+button,input,select{font:inherit}
+a{color:inherit}
+.shell{display:flex;min-height:100vh}
+.side{width:260px;background:#fafafa;border-right:1px solid var(--line);position:fixed;top:0;bottom:0;left:0;overflow-y:auto;z-index:40;transition:transform .2s;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px}
+.brand b{font-size:19px;font-weight:900;letter-spacing:-.2px}
+.brand i{display:block;font-size:11px;color:var(--mut)}
+.logo{width:40px;height:40px;flex:none}
+.nav{padding:4px 12px 20px;flex:1}
+.nav>a{display:flex;align-items:center;gap:12px;padding:10px;margin-top:2px;font-size:15.5px;color:#374151;text-decoration:none;border-radius:8px}
+.nav>a:hover{background:#f0f0f0}
+.nav>a.on{color:var(--g);font-weight:700;background:var(--gl)}
+.logout{padding:16px 22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#374151;font-size:15px}
+.main{flex:1;margin-left:260px;min-width:0}
+.top{height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;gap:12px;position:sticky;top:0;z-index:30}
+.top .menu{display:none;background:none;border:0;padding:6px;cursor:pointer}
+.top .crumb{color:var(--mut);font-size:13px}
+.scrim{display:none}
+.wrap{padding:22px;max-width:1150px}
+@media(max-width:860px){
+.side{transform:translateX(-100%)}.side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.25)}
+.main{margin-left:0}.top .menu{display:block}
+.scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:35}
+.wrap{padding:14px}
+}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.orgcard{display:flex;gap:16px;align-items:center;margin-bottom:22px}
+.orgicon{width:62px;height:62px;border-radius:12px;background:linear-gradient(135deg,#1f8a4c,#7fd3a3);display:grid;place-items:center;flex:none}
+.orgcard h1{margin:0;font-size:19px}
+.orgcard small{display:block;color:var(--mut);font-size:12.5px;margin-top:3px}
+h2{font-size:15px;margin:22px 0 12px}
+h3{margin:0 0 4px;font-size:16px}
+.sub{color:var(--mut);margin:0 0 14px;font-size:13.5px;line-height:1.5}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:980px){.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.g2{grid-template-columns:1fr}}
+.stat{position:relative;min-height:118px}
+.stat .lbl{font-size:12px;color:var(--mut);padding-right:44px}
+.stat .val{font-size:26px;font-weight:700;margin:6px 0 4px}
+.stat .hint{font-size:11.5px;color:var(--mut)}
+.stat .ic{position:absolute;right:16px;top:16px;width:38px;height:38px;border-radius:9px;display:grid;place-items:center}
+.ic svg{width:20px;height:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:700;color:#4b5563;background:#f9fafb;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.p-g{background:var(--gl);color:var(--g2)}.p-r{background:var(--redl);color:var(--red)}.p-a{background:var(--ambl);color:var(--amb)}.p-b{background:var(--blul);color:var(--blu)}.p-n{background:#f3f4f6;color:#4b5563}
+.bar{height:7px;background:#eef0f2;border-radius:9px;overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;background:var(--g)}
+.btn{background:var(--g);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--g2)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 10px;font-size:12px}
+label{display:block;font-size:12.5px;font-weight:700;margin:12px 0 5px;color:#374151}
+input,select{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;background:#fff}
+input:focus,select:focus{outline:2px solid #bfe5cf;border-color:var(--g)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.note{font-size:12px;color:var(--mut);line-height:1.5}
+.box{border-radius:10px;padding:14px;margin-top:14px;font-size:13.5px;line-height:1.5}
+.box.ok{background:var(--gl);border:1px solid #b9e2c9}
+.box.bad{background:var(--redl);border:1px solid #f5c2c2}
+.box.info{background:var(--blul);border:1px solid #c9d8fb}
+.checks{list-style:none;padding:0;margin:10px 0 0}
+.checks li{padding:5px 0;display:flex;gap:8px;align-items:flex-start}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.view{display:none}.view.on{display:block}
+.total td{font-weight:900;background:#f9fafb}
+.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:9px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:60;max-width:90vw}
+.toast.show{opacity:1}
+.score{font-size:40px;font-weight:900;line-height:1}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;margin-top:10px}
+.kv span:nth-child(odd){color:var(--mut)}
+.click{cursor:pointer}.click:hover td{background:#f6fbf8}
+.ov{position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:70;display:none;justify-content:flex-end}
+.ov.show{display:flex}
+.panel{width:min(600px,100%);height:100%;overflow-y:auto;background:var(--bg);box-shadow:-10px 0 40px rgba(0,0,0,.2)}
+.ph{background:#fff;border-bottom:1px solid var(--line);padding:16px 18px;position:sticky;top:0;z-index:2;display:flex;gap:14px;align-items:center}
+.av{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1f8a4c,#7fd3a3);color:#fff;font-weight:900;font-size:19px;display:grid;place-items:center;flex:none}
+.ph h3{margin:0}
+.x{margin-left:auto;background:#f3f4f6;border:0;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;flex:none}
+.pb{padding:16px 18px 40px}
+.pb .card{margin-bottom:14px}
+.pb h4{margin:0 0 10px;font-size:14px}
+.doc{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.doc:last-child{border-bottom:0}
+.doc .di{width:34px;height:34px;border-radius:8px;background:var(--gl);display:grid;place-items:center;flex:none;font-size:16px}
+.doc .dt{flex:1;min-width:0}
+.doc .dt b{display:block;font-size:13px}
+.doc .dt span{font-size:11.5px;color:var(--mut)}
+.doc .pts{font-size:12px;font-weight:700;white-space:nowrap;text-align:right}
+ .leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-tile-container, .leaflet-pane > svg, .leaflet-pane > canvas, .leaflet-zoom-box, .leaflet-image-layer, .leaflet-layer { position: absolute; left: 0; top: 0; } .leaflet-container { overflow: hidden; } .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow { -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-user-drag: none; } .leaflet-tile::selection { background: transparent; } .leaflet-safari .leaflet-tile { image-rendering: -webkit-optimize-contrast; } .leaflet-safari .leaflet-tile-container { width: 1600px; height: 1600px; -webkit-transform-origin: 0 0; } .leaflet-marker-icon, .leaflet-marker-shadow { display: block; } .leaflet-container .leaflet-overlay-pane svg { max-width: none !important; max-height: none !important; } .leaflet-container .leaflet-marker-pane img, .leaflet-container .leaflet-shadow-pane img, .leaflet-container .leaflet-tile-pane img, .leaflet-container img.leaflet-image-layer, .leaflet-container .leaflet-tile { max-width: none !important; max-height: none !important; width: auto; padding: 0; } .leaflet-container img.leaflet-tile { mix-blend-mode: plus-lighter; } .leaflet-container.leaflet-touch-zoom { -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; } .leaflet-container.leaflet-touch-drag { -ms-touch-action: pinch-zoom; touch-action: none; touch-action: pinch-zoom; } .leaflet-container.leaflet-touch-drag.leaflet-touch-zoom { -ms-touch-action: none; touch-action: none; } .leaflet-container { -webkit-tap-highlight-color: transparent; } .leaflet-container a { -webkit-tap-highlight-color: rgba(51, 181, 229, 0.4); } .leaflet-tile { filter: inherit; visibility: hidden; } .leaflet-tile-loaded { visibility: inherit; } .leaflet-zoom-box { width: 0; height: 0; -moz-box-sizing: border-box; box-sizing: border-box; z-index: 800; } .leaflet-overlay-pane svg { -moz-user-select: none; } .leaflet-pane { z-index: 400; } .leaflet-tile-pane { z-index: 200; } .leaflet-overlay-pane { z-index: 400; } .leaflet-shadow-pane { z-index: 500; } .leaflet-marker-pane { z-index: 600; } .leaflet-tooltip-pane { z-index: 650; } .leaflet-popup-pane { z-index: 700; } .leaflet-map-pane canvas { z-index: 100; } .leaflet-map-pane svg { z-index: 200; } .leaflet-vml-shape { width: 1px; height: 1px; } .lvml { behavior: url(#default#VML); display: inline-block; position: absolute; } .leaflet-control { position: relative; z-index: 800; pointer-events: visiblePainted; pointer-events: auto; } .leaflet-top, .leaflet-bottom { position: absolute; z-index: 1000; pointer-events: none; } .leaflet-top { top: 0; } .leaflet-right { right: 0; } .leaflet-bottom { bottom: 0; } .leaflet-left { left: 0; } .leaflet-control { float: left; clear: both; } .leaflet-right .leaflet-control { float: right; } .leaflet-top .leaflet-control { margin-top: 10px; } .leaflet-bottom .leaflet-control { margin-bottom: 10px; } .leaflet-left .leaflet-control { margin-left: 10px; } .leaflet-right .leaflet-control { margin-right: 10px; } .leaflet-fade-anim .leaflet-popup { opacity: 0; -webkit-transition: opacity 0.2s linear; -moz-transition: opacity 0.2s linear; transition: opacity 0.2s linear; } .leaflet-fade-anim .leaflet-map-pane .leaflet-popup { opacity: 1; } .leaflet-zoom-animated { -webkit-transform-origin: 0 0; -ms-transform-origin: 0 0; transform-origin: 0 0; } svg.leaflet-zoom-animated { will-change: transform; } .leaflet-zoom-anim .leaflet-zoom-animated { -webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1); -moz-transition: -moz-transform 0.25s cubic-bezier(0,0,0.25,1); transition: transform 0.25s cubic-bezier(0,0,0.25,1); } .leaflet-zoom-anim .leaflet-tile, .leaflet-pan-anim .leaflet-tile { -webkit-transition: none; -moz-transition: none; transition: none; } .leaflet-zoom-anim .leaflet-zoom-hide { visibility: hidden; } .leaflet-interactive { cursor: pointer; } .leaflet-grab { cursor: -webkit-grab; cursor: -moz-grab; cursor: grab; } .leaflet-crosshair, .leaflet-crosshair .leaflet-interactive { cursor: crosshair; } .leaflet-popup-pane, .leaflet-control { cursor: auto; } .leaflet-dragging .leaflet-grab, .leaflet-dragging .leaflet-grab .leaflet-interactive, .leaflet-dragging .leaflet-marker-draggable { cursor: move; cursor: -webkit-grabbing; cursor: -moz-grabbing; cursor: grabbing; } .leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-image-layer, .leaflet-pane > svg path, .leaflet-tile-container { pointer-events: none; } .leaflet-marker-icon.leaflet-interactive, .leaflet-image-layer.leaflet-interactive, .leaflet-pane > svg path.leaflet-interactive, svg.leaflet-image-layer.leaflet-interactive path { pointer-events: visiblePainted; pointer-events: auto; } .leaflet-container { background: #ddd; outline-offset: 1px; } .leaflet-container a { color: #0078A8; } .leaflet-zoom-box { border: 2px dotted #38f; background: rgba(255,255,255,0.5); } .leaflet-container { font-family: "Helvetica Neue", Arial, Helvetica, sans-serif; font-size: 12px; font-size: 0.75rem; line-height: 1.5; } .leaflet-bar { box-shadow: 0 1px 5px rgba(0,0,0,0.65); border-radius: 4px; } .leaflet-bar a { background-color: #fff; border-bottom: 1px solid #ccc; width: 26px; height: 26px; line-height: 26px; display: block; text-align: center; text-decoration: none; color: black; } .leaflet-bar a, .leaflet-control-layers-toggle { background-position: 50% 50%; background-repeat: no-repeat; display: block; } .leaflet-bar a:hover, .leaflet-bar a:focus { background-color: #f4f4f4; } .leaflet-bar a:first-child { border-top-left-radius: 4px; border-top-right-radius: 4px; } .leaflet-bar a:last-child { border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; border-bottom: none; } .leaflet-bar a.leaflet-disabled { cursor: default; background-color: #f4f4f4; color: #bbb; } .leaflet-touch .leaflet-bar a { width: 30px; height: 30px; line-height: 30px; } .leaflet-touch .leaflet-bar a:first-child { border-top-left-radius: 2px; border-top-right-radius: 2px; } .leaflet-touch .leaflet-bar a:last-child { border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; } .leaflet-control-zoom-in, .leaflet-control-zoom-out { font: bold 18px 'Lucida Console', Monaco, monospace; text-indent: 1px; } .leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out { font-size: 22px; } .leaflet-control-layers { box-shadow: 0 1px 5px rgba(0,0,0,0.4); background: #fff; border-radius: 5px; } .leaflet-control-layers-toggle { background-image: url(images/layers.png); width: 36px; height: 36px; } .leaflet-retina .leaflet-control-layers-toggle { background-image: url(images/layers-2x.png); background-size: 26px 26px; } .leaflet-touch .leaflet-control-layers-toggle { width: 44px; height: 44px; } .leaflet-control-layers .leaflet-control-layers-list, .leaflet-control-layers-expanded .leaflet-control-layers-toggle { display: none; } .leaflet-control-layers-expanded .leaflet-control-layers-list { display: block; position: relative; } .leaflet-control-layers-expanded { padding: 6px 10px 6px 6px; color: #333; background: #fff; } .leaflet-control-layers-scrollbar { overflow-y: scroll; overflow-x: hidden; padding-right: 5px; } .leaflet-control-layers-selector { margin-top: 2px; position: relative; top: 1px; } .leaflet-control-layers label { display: block; font-size: 13px; font-size: 1.08333em; } .leaflet-control-layers-separator { height: 0; border-top: 1px solid #ddd; margin: 5px -10px 5px -6px; } .leaflet-default-icon-path { background-image: url(images/marker-icon.png); } .leaflet-container .leaflet-control-attribution { background: #fff; background: rgba(255, 255, 255, 0.8); margin: 0; } .leaflet-control-attribution, .leaflet-control-scale-line { padding: 0 5px; color: #333; line-height: 1.4; } .leaflet-control-attribution a { text-decoration: none; } .leaflet-control-attribution a:hover, .leaflet-control-attribution a:focus { text-decoration: underline; } .leaflet-attribution-flag { display: inline !important; vertical-align: baseline !important; width: 1em; height: 0.6669em; } .leaflet-left .leaflet-control-scale { margin-left: 5px; } .leaflet-bottom .leaflet-control-scale { margin-bottom: 5px; } .leaflet-control-scale-line { border: 2px solid #777; border-top: none; line-height: 1.1; padding: 2px 5px 1px; white-space: nowrap; -moz-box-sizing: border-box; box-sizing: border-box; background: rgba(255, 255, 255, 0.8); text-shadow: 1px 1px #fff; } .leaflet-control-scale-line:not(:first-child) { border-top: 2px solid #777; border-bottom: none; margin-top: -2px; } .leaflet-control-scale-line:not(:first-child):not(:last-child) { border-bottom: 2px solid #777; } .leaflet-touch .leaflet-control-attribution, .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar { box-shadow: none; } .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar { border: 2px solid rgba(0,0,0,0.2); background-clip: padding-box; } .leaflet-popup { position: absolute; text-align: center; margin-bottom: 20px; } .leaflet-popup-content-wrapper { padding: 1px; text-align: left; border-radius: 12px; } .leaflet-popup-content { margin: 13px 24px 13px 20px; line-height: 1.3; font-size: 13px; font-size: 1.08333em; min-height: 1px; } .leaflet-popup-content p { margin: 17px 0; margin: 1.3em 0; } .leaflet-popup-tip-container { width: 40px; height: 20px; position: absolute; left: 50%; margin-top: -1px; margin-left: -20px; overflow: hidden; pointer-events: none; } .leaflet-popup-tip { width: 17px; height: 17px; padding: 1px; margin: -10px auto 0; pointer-events: auto; -webkit-transform: rotate(45deg); -moz-transform: rotate(45deg); -ms-transform: rotate(45deg); transform: rotate(45deg); } .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: white; color: #333; box-shadow: 0 3px 14px rgba(0,0,0,0.4); } .leaflet-container a.leaflet-popup-close-button { position: absolute; top: 0; right: 0; border: none; text-align: center; width: 24px; height: 24px; font: 16px/24px Tahoma, Verdana, sans-serif; color: #757575; text-decoration: none; background: transparent; } .leaflet-container a.leaflet-popup-close-button:hover, .leaflet-container a.leaflet-popup-close-button:focus { color: #585858; } .leaflet-popup-scrolled { overflow: auto; } .leaflet-oldie .leaflet-popup-content-wrapper { -ms-zoom: 1; } .leaflet-oldie .leaflet-popup-tip { width: 24px; margin: 0 auto; -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)"; filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678); } .leaflet-oldie .leaflet-control-zoom, .leaflet-oldie .leaflet-control-layers, .leaflet-oldie .leaflet-popup-content-wrapper, .leaflet-oldie .leaflet-popup-tip { border: 1px solid #999; } .leaflet-div-icon { background: #fff; border: 1px solid #666; } .leaflet-tooltip { position: absolute; padding: 6px; background-color: #fff; border: 1px solid #fff; border-radius: 3px; color: #222; white-space: nowrap; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,0.4); } .leaflet-tooltip.leaflet-interactive { cursor: pointer; pointer-events: auto; } .leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before { position: absolute; pointer-events: none; border: 6px solid transparent; background: transparent; content: ""; } .leaflet-tooltip-bottom { margin-top: 6px; } .leaflet-tooltip-top { margin-top: -6px; } .leaflet-tooltip-bottom:before, .leaflet-tooltip-top:before { left: 50%; margin-left: -6px; } .leaflet-tooltip-top:before { bottom: 0; margin-bottom: -12px; border-top-color: #fff; } .leaflet-tooltip-bottom:before { top: 0; margin-top: -12px; margin-left: -6px; border-bottom-color: #fff; } .leaflet-tooltip-left { margin-left: -6px; } .leaflet-tooltip-right { margin-left: 6px; } .leaflet-tooltip-left:before, .leaflet-tooltip-right:before { top: 50%; margin-top: -6px; } .leaflet-tooltip-left:before { right: 0; margin-right: -12px; border-left-color: #fff; } .leaflet-tooltip-right:before { left: 0; margin-left: -12px; border-right-color: #fff; } @media print { .leaflet-control { -webkit-print-color-adjust: exact; print-color-adjust: exact; } } #map{height:clamp(440px,70vh,760px);border-radius:10px;position:relative;z-index:0;background:#eaf2f8}.leaflet-container{font-family:Lato,system-ui,sans-serif}.plabel{background:#fff;border:1px solid #b7c7bb;color:#374151;font-size:11px;font-weight:700;padding:1px 6px;box-shadow:none}
+
+/* --- map upgrade --- */
+.leaflet-control-layers-toggle{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='1.8' stroke-linejoin='round'><path d='M12 3 3 8l9 5 9-5-9-5z'/><path d='m3 12.5 9 5 9-5'/><path d='m3 16.5 9 5 9-5'/></svg>")!important;background-size:22px 22px!important}
+.leaflet-control-layers{border-radius:6px!important;font-family:Lato,system-ui,sans-serif}
+.leaflet-control-layers-expanded{padding:8px 12px 8px 8px!important;font-size:13px}
+.leaflet-container{background:#0b192c}
+.mapbtn a{cursor:pointer}.mapbtn svg{width:16px;height:16px;margin-top:7px;stroke:#374151;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.msearch{display:flex;background:#fff;border-radius:6px;box-shadow:0 1px 5px rgba(0,0,0,.35);overflow:hidden}
+.msearch input{border:0;outline:0;padding:0 10px;height:32px;width:min(220px,46vw);font:inherit;font-size:13px}
+.msearch button{border:0;background:var(--g);color:#fff;width:34px;cursor:pointer;display:grid;place-items:center}
+.msearch button svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.lowzoom .plabel{display:none}
+.leaflet-popup-content{font-family:Lato,system-ui,sans-serif;font-size:13px;line-height:1.45;margin:12px 16px}
+.leaflet-popup-content b.t{font-size:14px}.leaflet-popup-content .pk{color:#6b7280}
+.psite{width:16px;height:16px;border-radius:50%;background:#1f8a4c;border:3px solid #fff;box-shadow:0 0 0 2px #1f8a4c,0 2px 6px rgba(0,0,0,.4)}
+.psite.planned{background:#fff;box-shadow:0 0 0 2px #1f8a4c,0 2px 6px rgba(0,0,0,.3);border-color:#fff}
+.psite.risk{background:#d97706;box-shadow:0 0 0 2px #d97706,0 2px 6px rgba(0,0,0,.4)}
+.card.mapfs{position:fixed;inset:0;z-index:9999;border-radius:0;margin:0;display:flex;flex-direction:column;overflow:auto}
+.card.mapfs #map{flex:1;height:auto!important;min-height:300px;border-radius:0}
+@media(max-width:600px){.msearch input{width:34vw}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="side" id="side">
+<div class="brand" style="gap:8px">
+<img src="data:image/png;base64,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" alt="LAICOS FARM" style="height:36px;width:auto;max-width:128px;object-fit:contain;flex:none">
+<div style="min-width:0"><b style="font-size:15.5px;line-height:1.15;display:block">LAICOS FARM</b><i>One Farmer. One Identity.</i></div>
+</div>
+<nav class="nav" id="nav">
+<a href="#overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="22" height="22"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+<a href="#projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="22" height="22"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg>Projects</a>
+<a href="#farmers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="22" height="22"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/></svg>Farmers</a>
+<a href="#enrol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="22" height="22"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>Enrol &amp; Verify Farmer</a>
+<a href="#credit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="22" height="22"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Credit Scores</a>
+<a href="#map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="22" height="22"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Farmer Map</a>
+</nav>
+<div class="logout"><span>Logout</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M9 8l-4 4 4 4M5 12h11"/></svg></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<div class="main">
+<header class="top">
+<button class="menu" id="menuBtn" aria-label="Open menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+<span class="crumb" id="crumb">Dashboard</span>
+</header>
+<div class="wrap">
+<div class="card orgcard">
+<div style="padding:8px 12px;border-radius:12px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;flex:none"><img src="data:image/png;base64,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" alt="LAICOS FARM logo" style="height:46px;width:auto;max-width:130px;object-fit:contain"></div>
+<div><h1>LAICOS FARM</h1><small>Farmer Identity &amp; Credit Tracker — Africa</small><small>projects@laicosfarm.africa</small></div>
+</div>
+<section class="view" id="v-overview">
+<h2>Dashboard</h2>
+<div class="grid g4" id="stats"></div>
+
+<div class="grid g2" style="margin-top:16px">
+<div class="card">
+<div class="row" style="justify-content:space-between;margin-bottom:6px">
+<h3 style="margin:0">Credit Score Rank</h3>
+<a href="#credit" class="note" style="font-weight:700;color:var(--g);text-decoration:none">All scores →</a>
+</div>
+<p class="sub" style="margin-bottom:10px">Top verified farmers ranked by credit score (300–850). Tap any row to open their profile.</p>
+<div class="tbl"><table><thead><tr><th>#</th><th>Farmer</th><th>Project</th><th class="num">Score</th><th>Band</th></tr></thead><tbody id="dashRankBody"></tbody></table></div>
+</div>
+
+<div class="card">
+<div class="row" style="justify-content:space-between;margin-bottom:6px">
+<h3 style="margin:0">Fund Allocation &amp; Disbursement</h3>
+<a href="#projects" class="note" style="font-weight:700;color:var(--g);text-decoration:none">Project ledger →</a>
+</div>
+<p class="sub" style="margin-bottom:12px">Approved budget vs. funds disbursed across tracked agricultural projects.</p>
+<div id="dashFundsBody"></div>
+</div>
+</div>
+
+<div class="card" style="margin-top:16px">
+<div class="row" style="justify-content:space-between;margin-bottom:6px">
+<h3 style="margin:0">Project Performance</h3>
+<a href="#projects" class="note" style="font-weight:700;color:var(--g);text-decoration:none">View all projects →</a>
+</div>
+<p class="sub" style="margin-bottom:12px">How funded projects are performing on repayment, farmer enrolment, and disbursement.</p>
+<div class="tbl"><table><thead><tr><th>Project</th><th>Crop</th><th>Location</th><th class="num">Enrolled</th><th class="num">Disbursed</th><th>Repayment</th><th>Status</th></tr></thead><tbody id="dashPerfBody"></tbody></table></div>
+</div>
+</section>
+<section class="view" id="v-projects">
+<h2>Projects</h2>
+<p class="sub">Every farmer-support project FarmTrust monitors, with verified farmers enrolled, funds disbursed (₦) and how well inputs/loans are being repaid.</p>
+<div class="row" style="margin-bottom:12px"><select id="fCountry" style="max-width:220px"></select><select id="fStatus" style="max-width:180px"><option value="">All statuses</option><option>Active</option><option>At Risk</option><option>Planned</option></select></div>
+<div class="tbl"><table><thead><tr><th>Project</th><th>Location</th><th>Crop / Value Chain</th><th class="num">Verified Farmers</th><th class="num">Disbursed (₦)</th><th>Repayment</th><th>Status</th></tr></thead><tbody id="projBody"></tbody></table></div>
+</section>
+<section class="view" id="v-farmers">
+<h2>Farmers</h2>
+<p class="sub">Each farmer exists once. Identity numbers are never shown in full — the system keeps a one-way fingerprint (hash) for matching, and masks the rest. Tap a farmer to open their full profile.</p>
+<input id="fSearch" placeholder="Search name, Farmer ID or project…" style="max-width:340px;margin-bottom:12px">
+<div class="tbl"><table><thead><tr><th>Farmer ID</th><th>Name</th><th>Country</th><th>Identity (masked)</th><th>Project</th><th class="num">Credit Score</th><th>Status</th></tr></thead><tbody id="farmBody"></tbody></table></div>
+</section>
+<section class="view" id="v-enrol">
+<h2>Enrol &amp; Verify Farmer</h2>
+<div class="grid g2">
+<div class="card">
+<h3>New farmer enrolment</h3>
+<p class="sub">Field agents enrol farmers here. Before an account is created, the system checks the national ID records and our own registry so the same person can't open a second account.</p>
+<form id="enrolForm">
+<label>Full name</label><input id="eName" required placeholder="e.g. Hauwa Ibrahim">
+<label>Country</label><select id="eCountry"></select>
+<div id="idFields"></div>
+<label>Phone number</label><input id="ePhone" required placeholder="e.g. 0803 555 0199">
+<label>Project</label><select id="eProject"></select>
+<div class="row" style="margin-top:16px"><button class="btn" type="submit">Verify &amp; Enrol</button><button class="btn ghost" type="button" id="fillDup">Try a duplicate</button><button class="btn ghost" type="button" id="fillNew">Fill a new farmer</button></div>
+</form>
+</div>
+<div class="card">
+<h3>Verification result</h3>
+<p class="sub">What the system checks, in order:</p>
+<ol class="note" style="padding-left:18px;margin:0">
+<li>ID format is valid (NIN 11 digits, BVN 11 digits).</li>
+<li>ID is confirmed against the national database through a licensed verification provider; name must match.</li>
+<li>ID fingerprint is compared with every farmer already in the registry, across all projects and countries.</li>
+<li>Phone number is checked so one SIM can't front several farmers.</li>
+<li>Only if all pass: a unique Farmer ID is issued.</li>
+</ol>
+<div id="enrolResult" class="box info">Fill the form and press <b>Verify &amp; Enrol</b>. Tip: tap <b>Try a duplicate</b> to see the system block a second account.</div>
+</div>
+</div>
+</section>
+<section class="view" id="v-credit">
+<h2>Credit Scores</h2>
+<p class="sub">Because each farmer has exactly one record, their history follows them from project to project. The score (300–850) is built from repayment record, documents provided, seasons completed, yield delivered against target and training attended. Tap a farmer to see the breakdown.</p>
+<div class="grid g2">
+<div class="tbl"><table><thead><tr><th>Farmer</th><th class="num">Score</th><th>Band</th></tr></thead><tbody id="credBody"></tbody></table></div>
+<div class="card" id="credDetail"></div>
+</div>
+<h2>How the Score Is Calculated</h2>
+<div class="card">
+<p class="sub">Every farmer starts at 300. Up to 550 more points come from five factors, weighted as below. After repayment history, the documents a farmer provides carry the most weight, and each one is checked by a LAICOS FARM officer before it counts.</p>
+<div class="tbl"><table><thead><tr><th>Factor</th><th>What it measures</th><th class="num">Weight</th></tr></thead><tbody id="factBody"></tbody></table></div>
+<h2 style="margin-top:18px">Documents Farmers Can Provide</h2>
+<p class="sub">Documents are scored out of 100 points. Only verified documents count; an uploaded document waits until an officer checks it against the original.</p>
+<div class="tbl"><table><thead><tr><th>Document</th><th>What it proves</th><th class="num">Points</th></tr></thead><tbody id="docBody"></tbody></table></div>
+</div>
+</section>
+<section class="view" id="v-map">
+<h2>Farmer Map</h2>
+<p class="sub">A full satellite world map: scroll or pinch to zoom, drag to pan, search any place, and toggle project or farmer layers. Each dot is a verified farmer, placed around their project site (until GPS is captured per farmer) and coloured by credit band. Tap a dot to open the profile, or a green pin for the project.</p>
+<div class="card"><div id="map"></div>
+<div class="row note" style="margin-top:10px"><span>🟢 Excellent</span><span>🔵 Good</span><span>🟠 Fair</span><span>🔴 Building</span><span>📍 Project site</span><span>⭕ Project area (~30 km)</span><span>🟩 Project countries</span></div>
+<div class="row" id="mapCnt" style="margin-top:8px"></div></div>
+</section>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="ov" id="ov"><div class="panel" id="panel"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const GEO={"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Tanzania"},"geometry":{"type":"MultiPolygon","coordinates":[[[[39.496,-6.175],[39.573,-6.387],[39.563,-6.427],[39.509,-6.452],[39.481,-6.454],[39.447,-6.42],[39.424,-6.348],[39.383,-6.365],[39.313,-6.279],[39.243,-6.275],[39.182,-6.173],[39.206,-6.083],[39.192,-5.931],[39.267,-5.853],[39.309,-5.722],[39.357,-5.812],[39.368,-5.951],[39.433,-6.115],[39.488,-6.166],[39.496,-6.175]]],[[[39.865,-4.906],[39.871,-4.957],[39.856,-5.004],[39.859,-5.155],[39.853,-5.255],[39.796,-5.394],[39.749,-5.444],[39.708,-5.429],[39.673,-5.407],[39.647,-5.369],[39.701,-5.114],[39.673,-4.927],[39.781,-4.945],[39.865,-4.906]]],[[[32.92,-9.407],[32.863,-9.381],[32.757,-9.322],[32.608,-9.271],[32.487,-9.213],[32.433,-9.156],[32.319,-9.135],[32.221,-9.126],[32.13,-9.073],[32.035,-9.067],[31.943,-9.054],[31.922,-9.019],[31.919,-8.942],[31.886,-8.922],[31.818,-8.902],[31.745,-8.903],[31.7,-8.914],[31.674,-8.909],[31.613,-8.863],[31.556,-8.805],[31.535,-8.713],[31.449,-8.654],[31.351,-8.607],[31.076,-8.612],[31.033,-8.598],[30.968,-8.551],[30.892,-8.474],[30.831,-8.386],[30.777,-8.266],[30.751,-8.194],[30.721,-8.104],[30.654,-7.971],[30.559,-7.782],[30.486,-7.627],[30.407,-7.461],[30.375,-7.339],[30.313,-7.204],[30.213,-7.038],[30.162,-6.973],[30.106,-6.915],[29.962,-6.803],[29.798,-6.692],[29.71,-6.617],[29.591,-6.394],[29.541,-6.314],[29.506,-6.172],[29.48,-6.025],[29.491,-5.965],[29.596,-5.776],[29.607,-5.723],[29.594,-5.651],[29.542,-5.5],[29.504,-5.401],[29.476,-5.317],[29.42,-5.176],[29.343,-4.983],[29.323,-4.899],[29.326,-4.836],[29.368,-4.669],[29.404,-4.497],[29.403,-4.449],[29.718,-4.456],[29.77,-4.418],[29.947,-4.307],[30.147,-4.085],[30.187,-3.993],[30.269,-3.85],[30.348,-3.78],[30.379,-3.731],[30.4,-3.654],[30.425,-3.589],[30.53,-3.492],[30.632,-3.419],[30.625,-3.389],[30.611,-3.366],[30.626,-3.347],[30.682,-3.309],[30.79,-3.275],[30.811,-3.201],[30.811,-3.116],[30.794,-3.069],[30.797,-3.015],[30.78,-2.985],[30.709,-2.977],[30.604,-2.935],[30.515,-2.918],[30.456,-2.893],[30.433,-2.875],[30.424,-2.824],[30.441,-2.769],[30.45,-2.753],[30.473,-2.694],[30.434,-2.659],[30.424,-2.642],[30.442,-2.613],[30.534,-2.426],[30.554,-2.4],[30.593,-2.397],[30.657,-2.374],[30.715,-2.363],[30.762,-2.372],[30.798,-2.363],[30.829,-2.338],[30.855,-2.265],[30.877,-2.143],[30.865,-2.044],[30.819,-1.967],[30.807,-1.851],[30.828,-1.694],[30.813,-1.563],[30.762,-1.459],[30.711,-1.397],[30.632,-1.367],[30.508,-1.208],[30.47,-1.131],[30.477,-1.083],[30.51,-1.067],[30.52,-1.062],[30.599,-1.07],[30.673,-1.051],[30.742,-1.008],[30.809,-0.995],[30.824,-0.999],[30.845,-1.002],[30.95,-1.002],[31.128,-1.002],[31.305,-1.002],[31.483,-1.002],[31.661,-1.002],[31.839,-1.002],[32.016,-1.002],[32.194,-1.002],[32.372,-1.002],[32.55,-1.002],[32.727,-1.002],[32.905,-1.002],[33.083,-1.002],[33.261,-1.002],[33.438,-1.002],[33.616,-1.002],[33.794,-1.002],[33.903,-1.002],[33.979,-1.002],[34.052,-1.04],[34.132,-1.085],[34.345,-1.204],[34.558,-1.323],[34.771,-1.442],[34.984,-1.561],[35.197,-1.68],[35.411,-1.799],[35.624,-1.918],[35.837,-2.037],[36.05,-2.156],[36.263,-2.275],[36.476,-2.394],[36.689,-2.513],[36.903,-2.632],[37.116,-2.751],[37.329,-2.87],[37.542,-2.989],[37.644,-3.045],[37.659,-3.07],[37.677,-3.178],[37.688,-3.246],[37.682,-3.306],[37.625,-3.407],[37.609,-3.46],[37.608,-3.497],[37.622,-3.512],[37.67,-3.517],[37.711,-3.541],[37.726,-3.56],[37.757,-3.636],[37.797,-3.674],[37.887,-3.739],[38.041,-3.85],[38.194,-3.96],[38.348,-4.071],[38.501,-4.181],[38.655,-4.292],[38.808,-4.402],[38.962,-4.513],[39.115,-4.624],[39.19,-4.677],[39.222,-4.692],[39.202,-4.776],[39.123,-4.98],[39.119,-5.065],[39.088,-5.165],[39.058,-5.232],[38.978,-5.519],[38.911,-5.626],[38.819,-5.878],[38.805,-6.07],[38.855,-6.205],[38.874,-6.331],[38.981,-6.455],[39.067,-6.499],[39.125,-6.556],[39.228,-6.685],[39.287,-6.815],[39.472,-6.879],[39.546,-7.024],[39.519,-7.124],[39.433,-7.207],[39.353,-7.341],[39.288,-7.518],[39.287,-7.788],[39.33,-7.747],[39.428,-7.813],[39.441,-8.012],[39.34,-8.243],[39.309,-8.351],[39.304,-8.444],[39.377,-8.721],[39.488,-8.862],[39.48,-8.906],[39.451,-8.943],[39.641,-9.192],[39.625,-9.409],[39.697,-9.578],[39.728,-9.725],[39.775,-9.837],[39.784,-9.915],[39.725,-10.0],[39.864,-10.022],[39.945,-10.092],[39.984,-10.16],[40.084,-10.157],[40.138,-10.203],[40.216,-10.241],[40.389,-10.354],[40.436,-10.41],[40.453,-10.443],[40.464,-10.464],[40.347,-10.552],[40.166,-10.688],[39.989,-10.821],[39.817,-10.912],[39.694,-10.955],[39.563,-10.979],[39.439,-11.035],[39.322,-11.123],[39.171,-11.167],[38.987,-11.167],[38.795,-11.229],[38.603,-11.345],[38.492,-11.413],[38.315,-11.311],[38.177,-11.279],[38.017,-11.282],[37.92,-11.295],[37.885,-11.317],[37.855,-11.379],[37.829,-11.482],[37.725,-11.581],[37.542,-11.675],[37.373,-11.71],[37.218,-11.687],[37.114,-11.647],[37.059,-11.592],[36.979,-11.567],[36.873,-11.571],[36.771,-11.61],[36.674,-11.684],[36.519,-11.716],[36.306,-11.706],[36.191,-11.671],[36.175,-11.609],[36.082,-11.537],[35.911,-11.455],[35.785,-11.453],[35.705,-11.532],[35.631,-11.582],[35.564,-11.602],[35.504,-11.605],[35.451,-11.59],[35.418,-11.583],[35.183,-11.575],[34.959,-11.578],[34.953,-11.544],[34.937,-11.463],[34.891,-11.394],[34.851,-11.352],[34.801,-11.341],[34.774,-11.342],[34.752,-11.309],[34.726,-11.238],[34.688,-11.177],[34.638,-11.127],[34.608,-11.08],[34.598,-11.037],[34.606,-10.99],[34.652,-10.873],[34.667,-10.792],[34.662,-10.71],[34.637,-10.626],[34.584,-10.525],[34.59,-10.496],[34.572,-10.428],[34.57,-10.38],[34.58,-10.32],[34.57,-10.241],[34.524,-10.073],[34.524,-10.03],[34.476,-9.949],[34.328,-9.757],[34.321,-9.732],[34.089,-9.538],[33.996,-9.495],[33.962,-9.532],[33.95,-9.565],[33.959,-9.627],[33.954,-9.658],[33.944,-9.672],[33.889,-9.67],[33.854,-9.663],[33.766,-9.611],[33.698,-9.598],[33.528,-9.608],[33.468,-9.62],[33.421,-9.608],[33.331,-9.519],[33.225,-9.5],[33.13,-9.496],[32.974,-9.395],[32.937,-9.4],[32.92,-9.407]]],[[[39.711,-7.977],[39.657,-7.991],[39.636,-7.978],[39.603,-7.936],[39.661,-7.901],[39.717,-7.832],[39.847,-7.73],[39.891,-7.663],[39.907,-7.649],[39.898,-7.728],[39.824,-7.901],[39.762,-7.912],[39.711,-7.977]]]]}},{"type":"Feature","properties":{"name":"Nigeria"},"geometry":{"type":"MultiPolygon","coordinates":[[[[7.301,4.418],[7.204,4.388],[7.14,4.395],[7.227,4.527],[7.271,4.499],[7.328,4.487],[7.301,4.418]]],[[[13.606,13.705],[13.763,13.49],[13.932,13.258],[14.064,13.079],[14.16,12.613],[14.17,12.524],[14.178,12.484],[14.185,12.447],[14.197,12.384],[14.273,12.356],[14.415,12.344],[14.519,12.298],[14.581,12.222],[14.587,12.209],[14.62,12.151],[14.627,12.109],[14.618,11.987],[14.597,11.83],[14.562,11.729],[14.582,11.591],[14.575,11.532],[14.56,11.492],[14.496,11.446],[14.409,11.401],[14.202,11.268],[14.143,11.249],[14.057,11.245],[13.981,11.212],[13.892,11.14],[13.7,10.873],[13.535,10.605],[13.479,10.383],[13.415,10.171],[13.27,10.036],[13.25,9.96],[13.244,9.916],[13.239,9.814],[13.221,9.645],[13.199,9.564],[13.175,9.54],[13.019,9.488],[12.929,9.426],[12.876,9.304],[12.856,9.171],[12.824,9.019],[12.807,8.887],[12.782,8.818],[12.731,8.746],[12.652,8.668],[12.583,8.624],[12.404,8.596],[12.311,8.42],[12.233,8.282],[12.231,8.227],[12.156,7.942],[12.025,7.728],[12.017,7.652],[12.016,7.59],[11.852,7.401],[11.809,7.345],[11.767,7.272],[11.809,7.202],[11.855,7.138],[11.861,7.116],[11.787,7.056],[11.658,6.952],[11.58,6.889],[11.563,6.855],[11.552,6.697],[11.529,6.655],[11.478,6.597],[11.402,6.534],[11.325,6.485],[11.237,6.451],[11.153,6.438],[11.106,6.458],[11.08,6.506],[11.033,6.698],[11.009,6.739],[10.954,6.777],[10.846,6.882],[10.738,6.988],[10.606,7.063],[10.578,7.058],[10.556,7.037],[10.519,6.93],[10.482,6.891],[10.413,6.878],[10.293,6.877],[10.205,6.892],[10.186,6.913],[10.168,6.959],[10.144,6.996],[10.039,6.921],[9.874,6.803],[9.821,6.784],[9.78,6.76],[9.726,6.65],[9.66,6.532],[9.574,6.47],[9.49,6.419],[9.442,6.373],[9.373,6.32],[9.239,6.186],[9.06,6.009],[8.997,5.918],[8.935,5.781],[8.899,5.63],[8.859,5.464],[8.801,5.197],[8.716,5.047],[8.641,4.927],[8.585,4.833],[8.556,4.755],[8.544,4.758],[8.515,4.725],[8.431,4.746],[8.394,4.814],[8.342,4.825],[8.253,4.924],[8.234,4.907],[8.328,4.656],[8.293,4.558],[8.029,4.555],[7.801,4.522],[7.644,4.525],[7.566,4.561],[7.531,4.655],[7.517,4.645],[7.509,4.595],[7.46,4.555],[7.284,4.548],[7.207,4.612],[7.144,4.684],[7.077,4.716],[7.087,4.686],[7.164,4.616],[7.155,4.514],[7.013,4.397],[6.923,4.391],[6.868,4.441],[6.839,4.523],[6.825,4.645],[6.788,4.725],[6.768,4.725],[6.786,4.652],[6.792,4.593],[6.793,4.469],[6.86,4.373],[6.757,4.344],[6.715,4.342],[6.633,4.34],[6.617,4.376],[6.602,4.455],[6.58,4.476],[6.555,4.341],[6.5,4.332],[6.462,4.333],[6.3,4.304],[6.264,4.309],[6.256,4.334],[6.275,4.372],[6.271,4.432],[6.215,4.385],[6.206,4.292],[6.173,4.277],[6.077,4.291],[5.971,4.339],[5.906,4.388],[5.799,4.456],[5.588,4.647],[5.554,4.733],[5.493,4.839],[5.448,4.946],[5.383,5.129],[5.403,5.142],[5.452,5.127],[5.476,5.154],[5.388,5.174],[5.37,5.195],[5.364,5.259],[5.368,5.338],[5.439,5.365],[5.501,5.379],[5.532,5.426],[5.55,5.474],[5.386,5.402],[5.232,5.484],[5.199,5.534],[5.216,5.572],[5.289,5.577],[5.394,5.575],[5.457,5.612],[5.418,5.625],[5.35,5.623],[5.325,5.648],[5.327,5.708],[5.305,5.694],[5.276,5.642],[5.173,5.603],[5.112,5.642],[5.106,5.728],[5.093,5.767],[5.042,5.798],[4.861,6.026],[4.634,6.217],[4.431,6.349],[4.126,6.411],[3.487,6.409],[3.451,6.427],[3.49,6.457],[3.546,6.477],[3.752,6.584],[3.717,6.598],[3.503,6.531],[3.43,6.525],[3.336,6.397],[2.772,6.376],[2.706,6.369],[2.708,6.428],[2.736,6.596],[2.754,6.662],[2.775,6.712],[2.753,6.772],[2.732,6.853],[2.721,6.98],[2.748,7.02],[2.757,7.068],[2.751,7.143],[2.75,7.395],[2.766,7.423],[2.784,7.443],[2.785,7.477],[2.751,7.542],[2.719,7.616],[2.72,7.723],[2.708,7.827],[2.686,7.874],[2.702,8.05],[2.712,8.273],[2.703,8.372],[2.724,8.442],[2.735,8.614],[2.733,8.783],[2.775,9.049],[2.898,9.061],[3.045,9.084],[3.11,9.188],[3.148,9.321],[3.136,9.452],[3.165,9.495],[3.223,9.566],[3.329,9.667],[3.325,9.778],[3.354,9.813],[3.405,9.839],[3.477,9.852],[3.557,9.907],[3.602,10.005],[3.646,10.16],[3.577,10.268],[3.578,10.292],[3.604,10.351],[3.647,10.409],[3.68,10.428],[3.758,10.413],[3.772,10.418],[3.784,10.436],[3.834,10.607],[3.83,10.654],[3.757,10.769],[3.745,10.85],[3.734,10.972],[3.716,11.08],[3.695,11.12],[3.656,11.155],[3.639,11.177],[3.488,11.395],[3.491,11.499],[3.554,11.632],[3.595,11.696],[3.653,11.732],[3.665,11.762],[3.647,11.8],[3.618,11.828],[3.612,11.887],[3.62,11.927],[3.641,11.97],[3.633,12.062],[3.634,12.202],[3.644,12.405],[3.647,12.53],[3.769,12.622],[3.948,12.775],[4.039,12.935],[4.087,13.055],[4.148,13.458],[4.191,13.482],[4.242,13.501],[4.421,13.648],[4.559,13.702],[4.665,13.733],[4.823,13.76],[4.922,13.749],[5.101,13.743],[5.242,13.757],[5.362,13.837],[5.416,13.859],[5.492,13.873],[5.838,13.765],[6.184,13.664],[6.247,13.673],[6.3,13.659],[6.386,13.604],[6.514,13.485],[6.59,13.409],[6.627,13.364],[6.804,13.108],[6.871,13.043],[6.937,13.008],[7.005,12.996],[7.057,13.0],[7.106,13.029],[7.173,13.086],[7.275,13.112],[7.358,13.107],[7.789,13.338],[7.83,13.341],[7.956,13.323],[8.095,13.291],[8.456,13.06],[8.751,12.908],[8.958,12.857],[9.202,12.821],[9.616,12.811],[9.929,13.135],[10.045,13.206],[10.185,13.27],[10.23,13.281],[10.476,13.33],[10.959,13.372],[11.412,13.354],[11.501,13.341],[11.693,13.298],[11.99,13.192],[12.118,13.09],[12.319,13.074],[12.463,13.094],[12.51,13.194],[12.655,13.327],[12.76,13.38],[12.872,13.449],[13.048,13.535],[13.194,13.573],[13.324,13.671],[13.427,13.702],[13.606,13.705]]]]}},{"type":"Feature","properties":{"name":"Mali"},"geometry":{"type":"Polygon","coordinates":[[[-11.389,12.404],[-11.382,12.479],[-11.449,12.532],[-11.451,12.558],[-11.444,12.628],[-11.414,12.775],[-11.417,12.832],[-11.39,12.942],[-11.434,12.992],[-11.444,13.028],[-11.493,13.087],[-11.549,13.17],[-11.562,13.237],[-11.581,13.29],[-11.635,13.37],[-11.674,13.382],[-11.758,13.395],[-11.772,13.367],[-11.803,13.327],[-11.832,13.316],[-11.878,13.365],[-11.895,13.406],[-11.895,13.444],[-11.957,13.511],[-12.054,13.633],[-12.044,13.734],[-11.984,13.788],[-11.966,13.829],[-11.961,13.875],[-11.988,13.931],[-12.02,13.975],[-12.011,14.072],[-12.019,14.206],[-12.068,14.274],[-12.113,14.323],[-12.175,14.377],[-12.228,14.459],[-12.207,14.571],[-12.187,14.648],[-12.281,14.809],[-12.105,14.745],[-12.082,14.766],[-12.022,14.805],[-11.941,14.887],[-11.873,14.995],[-11.842,15.129],[-11.829,15.245],[-11.798,15.343],[-11.76,15.426],[-11.676,15.512],[-11.597,15.573],[-11.503,15.637],[-11.455,15.625],[-11.366,15.537],[-11.169,15.359],[-11.007,15.223],[-10.948,15.151],[-10.896,15.15],[-10.815,15.282],[-10.732,15.395],[-10.697,15.423],[-10.587,15.435],[-10.493,15.44],[-10.412,15.438],[-10.262,15.416],[-10.194,15.396],[-10.13,15.384],[-9.941,15.374],[-9.755,15.401],[-9.578,15.437],[-9.447,15.458],[-9.44,15.512],[-9.448,15.575],[-9.427,15.623],[-9.385,15.668],[-9.351,15.677],[-9.335,15.526],[-9.294,15.503],[-9.177,15.496],[-8.987,15.496],[-8.783,15.496],[-8.579,15.496],[-8.375,15.496],[-8.171,15.496],[-7.967,15.496],[-7.763,15.496],[-7.559,15.496],[-7.355,15.496],[-7.152,15.496],[-6.948,15.496],[-6.744,15.496],[-6.54,15.496],[-6.336,15.496],[-6.132,15.496],[-5.928,15.496],[-5.724,15.496],[-5.513,15.496],[-5.456,15.789],[-5.404,16.058],[-5.36,16.283],[-5.51,16.442],[-5.629,16.569],[-5.656,16.81],[-5.685,17.058],[-5.713,17.307],[-5.742,17.556],[-5.77,17.804],[-5.799,18.053],[-5.827,18.302],[-5.856,18.55],[-5.884,18.799],[-5.912,19.048],[-5.941,19.296],[-5.969,19.545],[-5.998,19.794],[-6.026,20.042],[-6.055,20.291],[-6.083,20.54],[-6.112,20.788],[-6.14,21.037],[-6.169,21.286],[-6.197,21.534],[-6.226,21.783],[-6.254,22.032],[-6.283,22.28],[-6.311,22.529],[-6.34,22.777],[-6.368,23.026],[-6.397,23.275],[-6.425,23.523],[-6.454,23.772],[-6.482,24.021],[-6.51,24.269],[-6.539,24.518],[-6.567,24.767],[-6.594,24.995],[-6.287,24.995],[-5.96,24.995],[-5.641,24.995],[-5.173,24.995],[-4.823,24.996],[-4.517,24.804],[-4.24,24.624],[-3.913,24.409],[-3.585,24.195],[-3.258,23.981],[-2.93,23.767],[-2.603,23.553],[-2.275,23.339],[-1.948,23.125],[-1.62,22.911],[-1.293,22.697],[-0.965,22.482],[-0.638,22.268],[-0.311,22.054],[0.017,21.84],[0.344,21.626],[0.672,21.412],[0.999,21.198],[1.146,21.102],[1.159,21.062],[1.173,20.982],[1.164,20.891],[1.166,20.817],[1.209,20.767],[1.29,20.714],[1.611,20.556],[1.636,20.524],[1.647,20.459],[1.685,20.378],[1.753,20.332],[1.832,20.297],[1.929,20.273],[2.219,20.248],[2.281,20.21],[2.406,20.064],[2.474,20.035],[2.668,19.993],[2.808,19.969],[2.866,19.956],[2.992,19.917],[3.13,19.85],[3.204,19.79],[3.203,19.771],[3.203,19.718],[3.202,19.56],[3.227,19.474],[3.256,19.411],[3.254,19.373],[3.22,19.345],[3.192,19.312],[3.177,19.268],[3.138,19.212],[3.106,19.15],[3.12,19.103],[3.174,19.073],[3.256,19.013],[3.323,18.988],[3.356,18.987],[3.401,18.988],[3.439,18.996],[3.683,19.042],[3.91,19.084],[4.228,19.143],[4.228,18.968],[4.229,18.704],[4.23,18.411],[4.231,18.139],[4.232,17.831],[4.233,17.582],[4.234,17.288],[4.235,16.996],[4.203,16.963],[4.191,16.798],[4.182,16.582],[4.121,16.358],[4.015,16.193],[3.976,16.036],[3.947,15.946],[3.907,15.897],[3.898,15.838],[3.877,15.755],[3.843,15.702],[3.817,15.674],[3.71,15.642],[3.521,15.483],[3.504,15.356],[3.289,15.391],[3.06,15.427],[3.029,15.425],[3.011,15.408],[3.001,15.341],[2.69,15.33],[2.421,15.32],[2.088,15.309],[1.859,15.302],[1.569,15.286],[1.3,15.272],[1.121,15.126],[0.96,14.987],[0.947,14.982],[0.719,14.955],[0.433,14.979],[0.286,14.98],[0.229,14.964],[0.217,14.911],[0.007,14.985],[-0.236,15.059],[-0.405,15.012],[-0.432,15.029],[-0.454,15.06],[-0.537,15.078],[-0.666,15.07],[-0.76,15.048],[-0.908,14.937],[-1.019,14.841],[-1.05,14.82],[-1.205,14.762],[-1.494,14.626],[-1.657,14.527],[-1.695,14.508],[-1.768,14.486],[-1.88,14.481],[-1.973,14.457],[-2.057,14.195],[-2.113,14.168],[-2.457,14.274],[-2.527,14.258],[-2.587,14.228],[-2.779,14.074],[-2.874,13.951],[-2.926,13.787],[-2.919,13.736],[-2.917,13.679],[-2.951,13.648],[-2.997,13.637],[-3.039,13.639],[-3.198,13.673],[-3.249,13.658],[-3.27,13.577],[-3.267,13.401],[-3.302,13.281],[-3.397,13.244],[-3.47,13.196],[-3.528,13.183],[-3.576,13.194],[-3.853,13.374],[-3.947,13.402],[-4.051,13.382],[-4.151,13.306],[-4.196,13.256],[-4.259,13.197],[-4.329,13.119],[-4.31,13.052],[-4.261,12.975],[-4.225,12.879],[-4.227,12.794],[-4.481,12.672],[-4.46,12.63],[-4.422,12.582],[-4.422,12.493],[-4.429,12.338],[-4.48,12.282],[-4.546,12.226],[-4.587,12.155],[-4.627,12.12],[-4.699,12.076],[-4.798,12.032],[-4.969,11.993],[-5.106,11.968],[-5.158,11.942],[-5.23,11.89],[-5.288,11.828],[-5.302,11.76],[-5.291,11.683],[-5.27,11.62],[-5.245,11.577],[-5.229,11.522],[-5.25,11.376],[-5.3,11.206],[-5.347,11.13],[-5.424,11.089],[-5.49,11.042],[-5.469,10.931],[-5.457,10.771],[-5.476,10.644],[-5.479,10.565],[-5.507,10.483],[-5.524,10.426],[-5.557,10.44],[-5.694,10.433],[-5.844,10.39],[-5.896,10.355],[-5.908,10.307],[-5.941,10.275],[-5.989,10.239],[-6.035,10.195],[-6.117,10.202],[-6.197,10.232],[-6.238,10.262],[-6.241,10.279],[-6.215,10.322],[-6.193,10.369],[-6.191,10.4],[-6.218,10.476],[-6.24,10.558],[-6.231,10.598],[-6.25,10.718],[-6.261,10.724],[-6.366,10.693],[-6.404,10.685],[-6.426,10.672],[-6.433,10.649],[-6.408,10.572],[-6.424,10.559],[-6.483,10.561],[-6.565,10.586],[-6.654,10.656],[-6.676,10.634],[-6.686,10.578],[-6.692,10.512],[-6.669,10.392],[-6.693,10.349],[-6.753,10.357],[-6.834,10.357],[-6.904,10.345],[-6.95,10.342],[-6.979,10.3],[-6.992,10.252],[-6.964,10.199],[-6.968,10.176],[-6.989,10.156],[-7.017,10.143],[-7.04,10.145],[-7.105,10.204],[-7.182,10.226],[-7.363,10.259],[-7.385,10.34],[-7.415,10.341],[-7.457,10.384],[-7.498,10.44],[-7.533,10.437],[-7.562,10.421],[-7.661,10.427],[-7.749,10.342],[-7.814,10.237],[-7.884,10.186],[-7.961,10.163],[-7.991,10.162],[-7.974,10.23],[-7.986,10.278],[-8.007,10.322],[-8.231,10.438],[-8.267,10.486],[-8.302,10.618],[-8.324,10.75],[-8.322,10.827],[-8.306,10.896],[-8.313,10.95],[-8.337,10.991],[-8.404,11.03],[-8.475,11.048],[-8.564,10.997],[-8.606,10.987],[-8.646,10.99],[-8.667,11.009],[-8.664,11.036],[-8.567,11.177],[-8.52,11.236],[-8.464,11.281],[-8.425,11.305],[-8.401,11.339],[-8.399,11.367],[-8.407,11.386],[-8.471,11.412],[-8.569,11.478],[-8.621,11.485],[-8.665,11.515],[-8.711,11.618],[-8.733,11.637],[-8.78,11.648],[-8.822,11.673],[-8.82,11.807],[-8.818,11.923],[-8.914,12.109],[-8.951,12.226],[-8.999,12.346],[-9.043,12.402],[-9.12,12.45],[-9.216,12.483],[-9.3,12.49],[-9.365,12.479],[-9.395,12.465],[-9.394,12.442],[-9.341,12.366],[-9.332,12.324],[-9.34,12.283],[-9.358,12.255],[-9.405,12.252],[-9.487,12.229],[-9.588,12.182],[-9.658,12.143],[-9.715,12.042],[-9.754,12.03],[-9.821,12.042],[-10.011,12.116],[-10.167,12.177],[-10.275,12.213],[-10.34,12.19],[-10.373,12.18],[-10.466,12.139],[-10.59,11.99],[-10.619,11.941],[-10.644,11.926],[-10.677,11.899],[-10.709,11.899],[-10.735,11.916],[-10.743,11.927],[-10.806,12.034],[-10.876,12.152],[-10.933,12.205],[-11.005,12.208],[-11.066,12.171],[-11.129,12.095],[-11.21,12.025],[-11.261,12.004],[-11.305,12.015],[-11.415,12.104],[-11.492,12.167],[-11.502,12.199],[-11.475,12.247],[-11.448,12.319],[-11.418,12.378],[-11.389,12.404]]]}},{"type":"Feature","properties":{"name":"Kenya"},"geometry":{"type":"MultiPolygon","coordinates":[[[[40.994,-2.158],[40.957,-2.167],[40.976,-2.11],[41.086,-2.037],[41.131,-2.053],[41.139,-2.07],[41.137,-2.085],[41.118,-2.1],[40.994,-2.158]]],[[[33.903,-1.002],[33.9,-0.832],[33.924,-0.398],[33.921,-0.017],[33.943,0.174],[34.037,0.295],[34.081,0.382],[34.112,0.505],[34.161,0.605],[34.273,0.686],[34.293,0.731],[34.411,0.867],[34.482,1.042],[34.535,1.102],[34.602,1.156],[34.649,1.185],[34.727,1.214],[34.788,1.231],[34.799,1.245],[34.804,1.273],[34.784,1.381],[34.81,1.417],[34.851,1.489],[34.898,1.556],[34.941,1.599],[34.965,1.643],[34.976,1.72],[34.978,1.774],[34.978,1.862],[34.964,2.062],[34.914,2.23],[34.883,2.418],[34.906,2.48],[34.866,2.59],[34.847,2.596],[34.814,2.62],[34.773,2.723],[34.742,2.818],[34.723,2.842],[34.589,2.925],[34.523,3.12],[34.448,3.163],[34.407,3.358],[34.399,3.413],[34.442,3.606],[34.438,3.651],[34.393,3.692],[34.267,3.733],[34.165,3.813],[34.178,3.841],[34.186,3.87],[34.132,3.889],[33.976,4.22],[34.177,4.419],[34.38,4.621],[34.64,4.875],[34.878,5.11],[35.084,5.312],[35.268,5.492],[35.264,5.458],[35.265,5.412],[35.288,5.384],[35.325,5.365],[35.378,5.385],[35.424,5.413],[35.469,5.419],[35.745,5.344],[35.791,5.279],[35.788,5.208],[35.8,5.157],[35.779,5.106],[35.756,4.95],[35.763,4.808],[35.846,4.703],[35.92,4.62],[35.979,4.504],[36.022,4.468],[36.082,4.45],[36.272,4.445],[36.553,4.437],[36.824,4.43],[36.848,4.427],[36.906,4.411],[37.155,4.255],[37.383,4.111],[37.575,3.986],[37.763,3.865],[37.945,3.747],[38.086,3.649],[38.225,3.619],[38.452,3.605],[38.608,3.6],[38.753,3.559],[38.968,3.521],[39.128,3.501],[39.225,3.479],[39.494,3.456],[39.539,3.469],[39.658,3.578],[39.79,3.754],[39.842,3.851],[40.014,3.948],[40.316,4.083],[40.529,4.178],[40.765,4.273],[40.873,4.19],[41.021,4.057],[41.087,3.992],[41.14,3.963],[41.221,3.944],[41.319,3.943],[41.372,3.946],[41.482,3.963],[41.738,3.979],[41.884,3.978],[41.761,3.802],[41.613,3.59],[41.342,3.202],[41.135,2.997],[40.979,2.842],[40.964,2.815],[40.965,2.642],[40.967,2.221],[40.97,1.378],[40.973,0.535],[40.977,-0.307],[40.978,-0.729],[40.979,-0.87],[41.116,-1.047],[41.25,-1.221],[41.427,-1.45],[41.522,-1.572],[41.538,-1.613],[41.533,-1.695],[41.387,-1.867],[41.267,-1.945],[41.107,-1.982],[41.059,-1.975],[40.996,-1.951],[40.971,-1.992],[40.952,-2.056],[40.917,-2.042],[40.89,-2.024],[40.906,-2.138],[40.922,-2.194],[40.898,-2.27],[40.82,-2.336],[40.813,-2.392],[40.644,-2.539],[40.404,-2.556],[40.279,-2.629],[40.222,-2.688],[40.18,-2.819],[40.195,-3.019],[40.128,-3.173],[40.115,-3.251],[39.992,-3.351],[39.937,-3.442],[39.896,-3.536],[39.861,-3.577],[39.819,-3.786],[39.761,-3.913],[39.746,-3.955],[39.732,-3.993],[39.687,-4.068],[39.658,-4.119],[39.637,-4.153],[39.491,-4.478],[39.377,-4.625],[39.288,-4.609],[39.228,-4.666],[39.222,-4.692],[39.19,-4.677],[39.115,-4.624],[38.962,-4.513],[38.808,-4.402],[38.655,-4.292],[38.501,-4.181],[38.348,-4.071],[38.194,-3.96],[38.041,-3.85],[37.887,-3.739],[37.797,-3.674],[37.757,-3.636],[37.726,-3.56],[37.711,-3.541],[37.67,-3.517],[37.622,-3.512],[37.608,-3.497],[37.609,-3.46],[37.625,-3.407],[37.682,-3.306],[37.688,-3.246],[37.677,-3.178],[37.659,-3.07],[37.644,-3.045],[37.542,-2.989],[37.329,-2.87],[37.116,-2.751],[36.903,-2.632],[36.689,-2.513],[36.476,-2.394],[36.263,-2.275],[36.05,-2.156],[35.837,-2.037],[35.624,-1.918],[35.411,-1.799],[35.197,-1.68],[34.984,-1.561],[34.771,-1.442],[34.558,-1.323],[34.345,-1.204],[34.132,-1.085],[34.052,-1.04],[33.979,-1.002],[33.903,-1.002]]]]}},{"type":"Feature","properties":{"name":"Ghana"},"geometry":{"type":"Polygon","coordinates":[[[-0.069,11.116],[-0.005,11.056],[0.009,11.021],[-0.014,10.891],[-0.061,10.801],[-0.09,10.716],[-0.086,10.673],[-0.058,10.631],[0.039,10.564],[0.089,10.521],[0.148,10.455],[0.216,10.391],[0.332,10.307],[0.381,10.292],[0.379,10.269],[0.363,10.236],[0.352,9.925],[0.343,9.845],[0.335,9.804],[0.324,9.688],[0.312,9.671],[0.29,9.672],[0.27,9.668],[0.265,9.645],[0.273,9.621],[0.343,9.604],[0.327,9.587],[0.275,9.571],[0.252,9.536],[0.262,9.496],[0.233,9.464],[0.242,9.442],[0.26,9.426],[0.289,9.432],[0.371,9.486],[0.405,9.491],[0.448,9.48],[0.526,9.398],[0.529,9.358],[0.497,9.221],[0.466,9.115],[0.46,8.974],[0.493,8.895],[0.489,8.851],[0.453,8.814],[0.373,8.759],[0.379,8.722],[0.415,8.653],[0.483,8.575],[0.616,8.48],[0.686,8.355],[0.688,8.304],[0.647,8.253],[0.599,8.21],[0.584,8.146],[0.605,7.728],[0.5,7.547],[0.499,7.495],[0.51,7.435],[0.537,7.399],[0.591,7.389],[0.635,7.354],[0.62,7.227],[0.596,7.097],[0.592,7.034],[0.579,7.004],[0.538,6.98],[0.523,6.939],[0.533,6.888],[0.526,6.851],[0.548,6.802],[0.596,6.742],[0.673,6.593],[0.702,6.581],[0.715,6.549],[0.707,6.519],[0.737,6.453],[0.822,6.386],[0.912,6.329],[0.985,6.32],[1.002,6.269],[1.05,6.203],[1.084,6.174],[1.14,6.155],[1.185,6.145],[1.187,6.089],[1.106,6.051],[1.05,5.994],[1.008,5.906],[0.95,5.81],[0.749,5.76],[0.672,5.76],[0.26,5.757],[-0.127,5.568],[-0.349,5.501],[-0.485,5.394],[-0.669,5.319],[-0.798,5.227],[-1.064,5.183],[-1.502,5.038],[-1.638,4.981],[-1.777,4.88],[-2.002,4.762],[-2.09,4.764],[-2.266,4.874],[-2.399,4.929],[-2.723,5.014],[-2.965,5.046],[-3.082,5.082],[-3.114,5.089],[-3.087,5.128],[-3.019,5.131],[-2.948,5.119],[-2.895,5.149],[-2.816,5.153],[-2.795,5.185],[-2.789,5.264],[-2.79,5.328],[-2.762,5.357],[-2.755,5.433],[-2.794,5.6],[-2.821,5.619],[-2.962,5.643],[-2.973,5.676],[-2.998,5.711],[-3.025,5.798],[-3.056,5.926],[-3.106,6.086],[-3.201,6.348],[-3.224,6.441],[-3.24,6.536],[-3.244,6.649],[-3.224,6.691],[-3.227,6.749],[-3.236,6.807],[-3.169,6.941],[-3.038,7.105],[-3.01,7.164],[-2.986,7.205],[-2.982,7.264],[-2.959,7.455],[-2.896,7.685],[-2.857,7.772],[-2.83,7.819],[-2.798,7.896],[-2.79,7.932],[-2.669,8.022],[-2.613,8.047],[-2.601,8.082],[-2.62,8.121],[-2.612,8.148],[-2.583,8.161],[-2.538,8.172],[-2.506,8.209],[-2.557,8.493],[-2.598,8.776],[-2.6,8.8],[-2.625,8.84],[-2.649,8.957],[-2.69,9.025],[-2.747,9.045],[-2.747,9.11],[-2.689,9.219],[-2.674,9.283],[-2.702,9.302],[-2.706,9.351],[-2.686,9.432],[-2.696,9.481],[-2.706,9.534],[-2.766,9.658],[-2.781,9.746],[-2.75,9.797],[-2.751,9.91],[-2.783,10.083],[-2.788,10.193],[-2.767,10.238],[-2.777,10.282],[-2.82,10.323],[-2.823,10.363],[-2.787,10.402],[-2.791,10.432],[-2.837,10.455],[-2.878,10.508],[-2.915,10.592],[-2.907,10.728],[-2.839,10.977],[-2.83,10.998],[-2.752,10.997],[-2.752,10.986],[-2.509,10.989],[-2.232,10.991],[-1.901,10.995],[-1.6,10.998],[-1.586,11.009],[-1.537,11.023],[-1.233,10.997],[-1.042,11.01],[-0.962,11.002],[-0.903,10.985],[-0.772,10.995],[-0.701,10.989],[-0.649,10.927],[-0.627,10.927],[-0.598,10.954],[-0.545,10.984],[-0.492,11.008],[-0.454,11.056],[-0.43,11.093],[-0.396,11.086],[-0.346,11.088],[-0.313,11.119],[-0.299,11.167],[-0.069,11.116]]]}}]};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const naira=n=>"₦"+Math.round(n).toLocaleString("en-NG");
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600)}
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return("00000000"+(h>>>0).toString(16)).slice(-8)}
+const mask=s=>s.slice(0,2)+"•••••••"+s.slice(-2);
+const now=()=>new Date().toLocaleTimeString("en-NG",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+const countries={Nigeria:{code:"NG",ids:[["NIN","nin"],["BVN","bvn"]]},Ghana:{code:"GH",ids:[["Ghana Card No.","nid"]]},Kenya:{code:"KE",ids:[["National ID No.","nid"]]},Tanzania:{code:"TZ",ids:[["NIDA No.","nid"]]},Mali:{code:"ML",ids:[["NINA No.","nid"]]}};
+const projects=[
+{id:"P01",name:"Kano Rice Outgrower Scheme",country:"Nigeria",loc:"Kano",crop:"Rice",farmers:1240,disb:186000000,repay:94,status:"Active"},
+{id:"P02",name:"Niger State Maize Value Chain",country:"Nigeria",loc:"Minna, Niger",crop:"Maize",farmers:860,disb:112000000,repay:91,status:"Active"},
+{id:"P03",name:"Tamale Soybean Cooperative",country:"Ghana",loc:"Tamale",crop:"Soybean",farmers:540,disb:58000000,repay:88,status:"Active"},
+{id:"P04",name:"Kisumu Smallholder Dairy",country:"Kenya",loc:"Kisumu",crop:"Dairy",farmers:410,disb:71000000,repay:96,status:"Active"},
+{id:"P05",name:"Kaduna Ginger Aggregation",country:"Nigeria",loc:"Kafanchan, Kaduna",crop:"Ginger",farmers:320,disb:39000000,repay:82,status:"At Risk"},
+{id:"P06",name:"Morogoro Cassava Processing",country:"Tanzania",loc:"Morogoro",crop:"Cassava",farmers:615,disb:66000000,repay:90,status:"Active"},
+{id:"P07",name:"Ségou Irrigated Rice",country:"Mali",loc:"Ségou",crop:"Rice",farmers:280,disb:34000000,repay:79,status:"At Risk"},
+{id:"P08",name:"Benue Yam Storage Hubs",country:"Nigeria",loc:"Makurdi, Benue",crop:"Yam",farmers:0,disb:0,repay:0,status:"Planned"}
+];
+const DOCS=[
+{k:"bank",n:"Bank or mobile-money statement (6 months)",w:"Steady income and cash flow; linked to BVN in Nigeria",pts:20,ic:"🏦"},
+{k:"loan",n:"Past loan repayment record or credit bureau report",w:"How the farmer repaid earlier loans from banks, MFIs or input schemes",pts:20,ic:"📑"},
+{k:"land",n:"Land document (C of O, lease or community land letter)",w:"Secure access to the farm for the whole season",pts:15,ic:"🗺️"},
+{k:"sales",n:"Offtaker or market sales receipts",w:"Harvest is actually sold, so there is money to repay",pts:15,ic:"🧾"},
+{k:"coop",n:"Cooperative membership letter",w:"Belongs to a group that vouches for the farmer",pts:10,ic:"🤝"},
+{k:"guar",n:"Guarantor form",w:"A named person stands behind the loan",pts:10,ic:"✍️"},
+{k:"ins",n:"Crop or livestock insurance certificate",w:"Loss from flood, drought or disease is covered",pts:5,ic:"🛡️"},
+{k:"gps",n:"Farm GPS map and photos",w:"The farm exists, its size and its location",pts:5,ic:"📍"}];
+const FACTORS=[["Repayment record","Share of past input loans repaid on time",35],["Documents provided","Verified documents, scored out of 100 (table below)",30],["Seasons completed","Seasons farmed with LAICOS FARM, up to 5",15],["Yield vs target","Harvest delivered against the project target",15],["Training attended","Good-practice trainings attended",5]];
+const LOANS={Rice:450000,Maize:380000,Soybean:300000,Dairy:520000,Ginger:350000,Cassava:280000,Yam:400000};
+const farmers=[];
+let blocked=3;
+function addFarmer(o){
+const c=countries[o.country];const n=farmers.filter(f=>f.country===o.country).length+1;
+o.fid=o.fid||`FT-${c.code}-${String(n*6).padStart(5,"0")}`;
+o.keys=Object.entries(o.idv).map(([k,v])=>k+":"+hash(v));
+o.phoneKey=hash(o.phone.replace(/\D/g,"").slice(-10));
+farmers.push(o);return o;
+}
+[
+["Amina Bello","Nigeria",{nin:"35718204961",bvn:"22198457310"},"08031234501","P01",{repay:.98,seasons:5,yield:.92,train:1},["Kano","Bunkure LGA","2.5 ha","Bunkure Rice Farmers Cooperative","Female","Mar 2021"],"VVVVVVVV"],
+["Musa Abdullahi","Nigeria",{nin:"40912785532",bvn:"22310987456"},"08039876502","P01",{repay:.9,seasons:4,yield:.84,train:.75},["Kano","Kura LGA","3.0 ha","Kura Rice Growers Association","Male","Apr 2022"],"VVVVVVMV"],
+["Chinedu Okafor","Nigeria",{nin:"51830049217",bvn:"22457780193"},"08061112203","P02",{repay:.72,seasons:3,yield:.7,train:.5},["Niger","Bosso LGA","4.0 ha","Bosso Maize Cooperative","Male","Jan 2023"],"VMVPVVMM"],
+["Hauwa Mohammed","Nigeria",{nin:"62204718835",bvn:"22501673384"},"08075550104","P02",{repay:1,seasons:3,yield:.95,train:1},["Niger","Chanchaga LGA","2.0 ha","Chanchaga Women Farmers Group","Female","Jan 2023"],"VVVVVVPV"],
+["Kwame Mensah","Ghana",{nid:"GHA729104538"},"0244100105","P03",{repay:.88,seasons:4,yield:.8,train:.75},["Northern Region","Tolon District","3.5 ha","Tolon Soy Farmers Union","Male","May 2022"],"VVPVVVMV"],
+["Akosua Boateng","Ghana",{nid:"GHA510337826"},"0207200106","P03",{repay:.95,seasons:2,yield:.88,train:1},["Northern Region","Savelugu","1.8 ha","Savelugu Women in Agriculture","Female","May 2024"],"VMVVVVMV"],
+["Wanjiru Kamau","Kenya",{nid:"31874420"},"0712300107","P04",{repay:1,seasons:5,yield:.97,train:1},["Kisumu County","Nyando","1.2 ha · 6 dairy cows","Nyando Dairy Cooperative","Female","Feb 2021"],"VVVVVVVV"],
+["Otieno Odhiambo","Kenya",{nid:"28013957"},"0722400108","P04",{repay:.85,seasons:2,yield:.78,train:.5},["Kisumu County","Muhoroni","0.8 ha · 3 dairy cows","Muhoroni Dairy Cooperative","Male","Jun 2024"],"VMMPVVMV"],
+["Yakubu Danjuma","Nigeria",{nin:"73519026648",bvn:"22688015429"},"08088880109","P05",{repay:.55,seasons:2,yield:.6,train:.25},["Kaduna","Jema'a LGA","2.2 ha","Kafanchan Ginger Growers","Male","Feb 2024"],"PMMMVPMM"],
+["Neema Mwakyusa","Tanzania",{nid:"19870412311"},"0754500110","P06",{repay:.93,seasons:3,yield:.86,train:.75},["Morogoro","Mvomero District","2.6 ha","Mvomero Cassava Growers","Female","Mar 2023"],"VVVVVPMV"],
+["Aminata Traoré","Mali",{nid:"ML40215893"},"76600111","P07",{repay:.62,seasons:1,yield:.65,train:.5},["Ségou","Niono Cercle","1.5 ha","Niono Women Rice Union","Female","Jul 2025"],"MMPMVVMM"],
+["Ifeoma Nwosu","Nigeria",{nin:"84720361159",bvn:"22735590146"},"08099990112","P02",{repay:.97,seasons:4,yield:.9,train:1},["Niger","Lapai LGA","3.2 ha","Lapai Maize Cooperative","Female","Feb 2022"],"VVVVVVMV"]
+].forEach(([name,country,idv,phone,proj,h,pr,dc])=>addFarmer({name,country,idv,phone,proj,h,status:"Verified",prof:{region:pr[0],area:pr[1],size:pr[2],coop:pr[3],sex:pr[4],since:pr[5]},docs:Object.fromEntries(DOCS.map((d,i)=>[d.k,dc[i]]))}));
+function docScore(f){return DOCS.reduce((a,d)=>a+(f.docs&&f.docs[d.k]==="V"?d.pts:0),0)/100}
+function parts(f){const h=f.h;return [["Repayment record",h.repay,35],["Documents provided",docScore(f),30],["Seasons completed",Math.min(h.seasons,5)/5,15],["Yield vs target",h.yield,15],["Training attended",h.train,5]]}
+function score(f){return Math.round(300+550*parts(f).reduce((a,p)=>a+p[1]*p[2]/100,0))}
+function band(s){return s>=740?["Excellent","p-g"]:s>=670?["Good","p-b"]:s>=580?["Fair","p-a"]:["Building","p-r"]}
+const projName=id=>(projects.find(p=>p.id===id)||{}).name||"—";
+const statusPill=s=>`<span class="pill ${s==="Active"?"p-g":s==="At Risk"?"p-r":"p-n"}">${s}</span>`;
+/* ---------- RENDER ---------- */
+function renderStats(){
+const tf=projects.reduce((a,p)=>a+p.farmers,0), cs=new Set(projects.map(p=>p.country)).size;
+const st=[["Total Projects",projects.length,`Across ${cs} countries`,"var(--blul)","var(--blu)",'<path d="M3 21h18M5 21V10l7-5 7 5v11"/>'],
+["Verified Farmers",tf.toLocaleString(),"One identity each","var(--gl)","var(--g)",'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/>'],
+["Funds Tracked","₦"+(projects.reduce((a,p)=>a+p.disb,0)/1e6).toLocaleString()+"M","Disbursed to date","var(--purl)","var(--pur)",'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>'],
+["Duplicates Blocked",blocked,"Second accounts stopped","var(--redl)","var(--red)",'<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/>']];
+$("#stats").innerHTML=st.map(s=>`<div class="card stat"><div class="lbl">${s[0]}</div><div class="val">${s[1]}</div><div class="hint">${s[2]}</div><div class="ic" style="background:${s[3]};color:${s[4]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${s[5]}</svg></div></div>`).join("");
+renderDashboardExtras();
+}
+function renderDashboardExtras(){
+const ranked=[...farmers].sort((a,b)=>score(b)-score(a)).slice(0,5);
+$("#dashRankBody").innerHTML=ranked.map((f,i)=>{const s=score(f),b=band(s);
+return `<tr class="click" data-p="${f.fid}"><td><b>${i+1}</b></td><td><b>${f.name}</b><div class="note mono">${f.fid}</div></td><td>${f.country} · ${(projects.find(p=>p.id===f.proj)||{}).crop||"—"}</td><td class="num"><b>${s}</b></td><td><span class="pill ${b[1]}">${b[0]}</span></td></tr>`}).join("");
+bindProfiles("#dashRankBody");
+
+const totalDisb=projects.reduce((a,p)=>a+p.disb,0);
+const approvedPool=Math.round(totalDisb*1.25);
+const remainingPool=Math.max(0,approvedPool-totalDisb);
+const pct=approvedPool?Math.min(100,Math.round(totalDisb/approvedPool*100)):0;
+const topByDisb=[...projects].filter(p=>p.disb>0).sort((a,b)=>b.disb-a.disb).slice(0,4);
+$("#dashFundsBody").innerHTML=`<div class="grid g2" style="gap:10px;margin-bottom:12px">
+<div style="background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px 12px"><div class="note">Approved Pool</div><div style="font-size:18px;font-weight:900;margin-top:2px">${naira(approvedPool)}</div></div>
+<div style="background:var(--gl);border:1px solid #b9e2c9;border-radius:10px;padding:10px 12px"><div class="note" style="color:var(--g2)">Disbursed (${pct}%)</div><div style="font-size:18px;font-weight:900;color:var(--g2);margin-top:2px">${naira(totalDisb)}</div></div>
+</div>
+<div class="bar" style="height:9px;margin-bottom:14px"><i style="width:${pct}%"></i></div>
+<div class="note" style="font-weight:700;color:#374151;margin-bottom:6px">Top Disbursement Breakdown</div>
+${topByDisb.map(p=>{const pApp=Math.round(p.disb*1.25);const share=Math.round(p.disb/totalDisb*100);
+return `<div style="margin:8px 0"><div class="row" style="justify-content:space-between;font-size:12.5px"><span><b>${p.name}</b> <span class="note">(${share}% of disbursed)</span></span><span class="num"><b>${naira(p.disb)}</b> <span class="note">/ ${naira(pApp)}</span></span></div><div class="bar" style="margin-top:4px"><i style="width:${share}%;background:${p.status==="At Risk"?"#f59e0b":"var(--g)"}"></i></div></div>`}).join("")}
+<div class="note" style="margin-top:10px">Undisbursed approved reserve: <b>${naira(remainingPool)}</b></div>`;
+
+const perfProjects=[...projects].sort((a,b)=>b.disb-a.disb).slice(0,5);
+$("#dashPerfBody").innerHTML=perfProjects.map(p=>{const repCol=p.repay<85?"#f59e0b":"var(--g)";
+return `<tr><td><b>${p.name}</b></td><td>${p.crop}</td><td>${p.loc}, ${p.country}</td><td class="num">${p.farmers.toLocaleString()}</td><td class="num">${naira(p.disb)}</td><td>${p.status==="Planned"?'<span class="note">Not started</span>':`<div class="row" style="flex-wrap:nowrap"><div class="bar" style="flex:1"><i style="width:${p.repay}%;background:${repCol}"></i></div><span>${p.repay}%</span></div>`}</td><td>${statusPill(p.status)}</td></tr>`}).join("");
+}
+function renderProjects(){
+const c=$("#fCountry").value,s=$("#fStatus").value;
+const rows=projects.filter(p=>(!c||p.country===c)&&(!s||p.status===s));
+const tf=rows.reduce((a,p)=>a+p.farmers,0),td=rows.reduce((a,p)=>a+p.disb,0);
+$("#projBody").innerHTML=rows.map(p=>`<tr><td><b>${p.name}</b></td><td>${p.loc}, ${p.country}</td><td>${p.crop}</td><td class="num">${p.farmers.toLocaleString()}</td><td class="num">${naira(p.disb)}</td><td>${p.status==="Planned"?'<span class="note">Not started</span>':`<div class="row" style="flex-wrap:nowrap"><div class="bar" style="flex:1"><i style="width:${p.repay}%;background:${p.repay<85?"#f59e0b":"var(--g)"}"></i></div><span>${p.repay}%</span></div>`}</td><td>${statusPill(p.status)}</td></tr>`).join("")+
+`<tr class="total"><td colspan="3">Total (${rows.length} projects)</td><td class="num">${tf.toLocaleString()}</td><td class="num">${naira(td)}</td><td colspan="2"></td></tr>`;
+}
+function idMasked(f){return Object.entries(f.idv).map(([k,v])=>`${k.toUpperCase()==="NID"?"ID":k.toUpperCase()} ${mask(v)}`).join("<br>")}
+function renderFarmers(){
+const q=$("#fSearch").value.toLowerCase();
+$("#farmBody").innerHTML=farmers.filter(f=>(f.name+f.fid+projName(f.proj)).toLowerCase().includes(q)).map(f=>{const s=score(f);
+return `<tr class="click" data-p="${f.fid}"><td class="mono">${f.fid}</td><td>${f.name}</td><td>${f.country}</td><td class="mono">${idMasked(f)}</td><td>${projName(f.proj)}</td><td class="num"><b>${s}</b></td><td><span class="pill p-g">${f.status}</span></td></tr>`}).join("");
+bindProfiles("#farmBody");
+}
+let selCred=null;
+function renderCredit(){
+const list=[...farmers].sort((a,b)=>score(b)-score(a));
+if(!selCred)selCred=list[0].fid;
+$("#credBody").innerHTML=list.map(f=>{const s=score(f),b=band(s);return `<tr style="cursor:pointer;${f.fid===selCred?"background:#f0faf4":""}" data-f="${f.fid}"><td>${f.name}<div class="note mono">${f.fid}</div></td><td class="num"><b>${s}</b></td><td><span class="pill ${b[1]}">${b[0]}</span></td></tr>`}).join("");
+$$("#credBody tr").forEach(r=>r.onclick=()=>{selCred=r.dataset.f;renderCredit()});
+const f=farmers.find(x=>x.fid===selCred),s=score(f),b=band(s);
+const pp=parts(f);
+$("#credDetail").innerHTML=`<div class="note">${f.fid} · ${projName(f.proj)}</div><h3 style="margin-top:6px">${f.name}</h3>
+<div class="row" style="margin:12px 0"><span class="score">${s}</span><span class="pill ${b[1]}">${b[0]}</span></div>
+${pp.map(p=>`<div style="margin:10px 0"><div class="row" style="justify-content:space-between;font-size:12.5px"><span>${p[0]} <span class="note">(weight ${p[2]}%)</span></span><b>${Math.round(p[1]*100)}%</b></div><div class="bar" style="margin-top:5px"><i style="width:${p[1]*100}%"></i></div></div>`).join("")}
+<div class="kv"><span>Seasons on record</span><span>${f.h.seasons}</span><span>Country</span><span>${f.country}</span><span>Documents verified</span><span>${DOCS.filter(d=>f.docs[d.k]==="V").length} of ${DOCS.length}</span><span>Accounts held</span><span><b>1</b> (duplicates impossible)</span></div>
+<button class="btn" style="margin-top:14px;width:100%" onclick="openProfile('${f.fid}')">Open full profile</button>
+<div class="box info" style="font-size:12.5px">Score = 300 + 550 × weighted total of the five factors. Lenders see the score and band; personal ID numbers stay masked.</div>`;
+$("#factBody").innerHTML=FACTORS.map(x=>`<tr><td><b>${x[0]}</b></td><td class="note">${x[1]}</td><td class="num">${x[2]}%</td></tr>`).join("");
+$("#docBody").innerHTML=DOCS.map(d=>`<tr><td>${d.ic} <b>${d.n}</b></td><td class="note">${d.w}</td><td class="num">${d.pts}</td></tr>`).join("")+`<tr class="total"><td colspan="2">Total</td><td class="num">${DOCS.reduce((a,d)=>a+d.pts,0)}</td></tr>`;
+}
+/* ---------- MAP ---------- */
+const PC={P01:[12.0,8.5],P02:[9.6,6.55],P03:[9.4,-0.85],P04:[-0.1,34.75],P05:[9.58,8.3],P06:[-6.8,37.66],P07:[13.43,-6.27],P08:[7.73,8.52]};
+const OUT_REMOVED=0;
+let LMAP=null,LSITES=null,LFARM=null,LHOME=null;
+let WORLD=null;
+const ICO={home:'<svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7M5 10v10h5v-6h4v6h5V10"/></svg>',
+globe:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg>',
+full:'<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>'};
+function mapFs(on){const c=$("#map").closest(".card");c.classList.toggle("mapfs",on===undefined?!c.classList.contains("mapfs"):on);setTimeout(()=>{LMAP.invalidateSize();fitMin()},60)}
+function fitMin(){LMAP.setMinZoom(Math.max(1,LMAP.getBoundsZoom(WORLD,true)))}
+function homeView(){LMAP.fitBounds(L.latLngBounds(Object.values(PC)),{padding:[50,50],maxZoom:6})}
+function mkBtn(pos,html,title,fn){const C=L.Control.extend({options:{position:pos},onAdd(){const d=L.DomUtil.create("div","leaflet-bar mapbtn"),a=L.DomUtil.create("a","",d);a.href="#";a.role="button";a.title=title;a.setAttribute("aria-label",title);a.innerHTML=html;L.DomEvent.disableClickPropagation(d);L.DomEvent.on(a,"click",e=>{L.DomEvent.preventDefault(e);fn()});return d}});return new C()}
+function searchCtl(){const C=L.Control.extend({options:{position:"topleft"},onAdd(){const d=L.DomUtil.create("form","msearch");d.innerHTML='<input type="search" placeholder="Search a place…" aria-label="Search a place"><button type="submit" title="Search">'+ICO.search+'</button>';L.DomEvent.disableClickPropagation(d);L.DomEvent.disableScrollPropagation(d);d.onsubmit=async e=>{e.preventDefault();const q=d.querySelector("input").value.trim();if(!q)return;try{const r=await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(q));const j=await r.json();if(!j.length){toast("Place not found");return}const bb=j[0].boundingbox.map(Number);LMAP.flyToBounds([[bb[0],bb[2]],[bb[1],bb[3]]],{maxZoom:14,duration:1.2})}catch(x){toast("Search needs an internet connection")}};return d}});return new C()}
+function renderMap(){
+if(typeof L==="undefined"){$("#map").innerHTML='<p class="note" style="padding:24px">The map library could not load. Check your internet connection and reload.</p>';return}
+WORLD=WORLD||L.latLngBounds([[-85,-180],[85,180]]);
+const jit=(s,k)=>((parseInt(hash(s+k),16)%1000)/1000-.5)*.6;
+const col={"p-g":"#16a34a","p-b":"#2563eb","p-a":"#d97706","p-r":"#dc2626"};
+if(!LMAP){
+LMAP=L.map("map",{minZoom:2,maxZoom:18,zoomSnap:.5,zoomDelta:.5,wheelPxPerZoomLevel:90,maxBounds:WORLD.pad(.02),maxBoundsViscosity:1,zoomControl:false,worldCopyJump:false});
+LMAP.setView([8,10],4);
+const cc='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+const esriAttr='Imagery &copy; Esri, Maxar, Earthstar Geographics';
+L.layerGroup([
+ L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,noWrap:true,attribution:esriAttr}),
+ L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,noWrap:true})
+]).addTo(LMAP);
+LMAP.attributionControl.setPrefix("<a href='https://leafletjs.com'>Leaflet</a>");
+LMAP.attributionControl.addAttribution("Boundaries: Natural Earth");
+const names=[...new Set(projects.map(p=>p.country))];
+const LC=L.geoJSON(GEO,{style:f=>{const on=names.includes(f.properties.name);return {color:"#1f8a4c",weight:on?1.6:0,fillColor:"#1f8a4c",fillOpacity:on?.16:0}},onEachFeature:(f,l)=>l.bindTooltip(f.properties.name,{sticky:true})}).addTo(LMAP);
+LSITES=L.layerGroup().addTo(LMAP);LFARM=L.layerGroup().addTo(LMAP);
+L.control.zoom({position:"topleft"}).addTo(LMAP);
+searchCtl().addTo(LMAP);
+LHOME=mkBtn("topleft",ICO.home,"Zoom to project sites",homeView).addTo(LMAP);
+mkBtn("topleft",ICO.globe,"Show the whole world",()=>LMAP.fitBounds(WORLD)).addTo(LMAP);
+mkBtn("topleft",ICO.full,"Toggle fullscreen",()=>mapFs()).addTo(LMAP);
+L.control.layers(null,{"Project countries":LC,"Project sites":LSITES,"Farmers":LFARM},{position:"topright"}).addTo(LMAP);
+L.control.scale({imperial:false,position:"bottomleft"}).addTo(LMAP);
+LMAP.on("zoomend",()=>LMAP.getContainer().classList.toggle("lowzoom",LMAP.getZoom()<4));
+window.addEventListener("resize",()=>{if(LMAP){LMAP.invalidateSize();fitMin()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#map").closest(".card").classList.contains("mapfs"))mapFs(false)});
+setTimeout(()=>{LMAP.invalidateSize();fitMin();homeView()},60);
+}
+LSITES.clearLayers();LFARM.clearLayers();
+projects.forEach(p=>{const c=PC[p.id];
+L.circle(c,{radius:30000,color:"#1f8a4c",weight:1.5,dashArray:"4 3",fillColor:"#1f8a4c",fillOpacity:.12,interactive:false}).addTo(LSITES);
+const cls="psite"+(p.status==="Planned"?" planned":p.status==="At Risk"?" risk":"");
+const pop=`<b class="t">${p.name}</b><br><span class="pk">${p.loc}, ${p.country}</span><br>Crop: ${p.crop}<br>Farmers: <b>${p.farmers.toLocaleString()}</b><br>Disbursed: <b>${naira(p.disb)}</b><br>`+(p.status==="Planned"?"Not started":`Repayment: <b>${p.repay}%</b>`)+`<br>${statusPill(p.status)}`;
+L.marker(c,{icon:L.divIcon({className:"",html:`<div class="${cls}"></div>`,iconSize:[16,16],iconAnchor:[8,8]}),title:p.name,riseOnHover:true}).bindPopup(pop).bindTooltip(p.loc.split(",")[0],{permanent:true,direction:"right",offset:[12,0],className:"plabel"}).addTo(LSITES)});
+farmers.forEach(f=>{const c=PC[f.proj],s=score(f);L.circleMarker([c[0]+jit(f.fid,"y"),c[1]+jit(f.fid,"x")],{radius:7,color:"#fff",weight:2,fillColor:col[band(s)[1]],fillOpacity:1}).bindTooltip(`${f.name} · ${f.fid} · ${s}`).on("click",()=>{mapFs(false);openProfile(f.fid)}).addTo(LFARM)});
+setTimeout(()=>LMAP.invalidateSize(),50);
+const cn={};farmers.forEach(f=>cn[f.country]=(cn[f.country]||0)+1);
+$("#mapCnt").innerHTML=Object.entries(cn).map(([k,v])=>`<span class="pill p-n">${k}: ${v}</span>`).join("");
+}
+
+/* ---------- ENROL ---------- */
+function idFields(){const c=countries[$("#eCountry").value];
+$("#idFields").innerHTML=c.ids.map(([l,k])=>`<label>${l}</label><input id="id_${k}" required inputmode="${k==="nid"?"text":"numeric"}" placeholder="${k==="nin"||k==="bvn"?"11 digits":"ID number"}">`).join("");}
+function setupEnrol(){
+$("#eCountry").innerHTML=Object.keys(countries).map(c=>`<option>${c}</option>`).join("");
+$("#eProject").innerHTML=projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join("");
+$("#eCountry").onchange=()=>{idFields();const p=projects.find(p=>p.country===$("#eCountry").value);if(p)$("#eProject").value=p.id};
+idFields();
+$("#fillDup").onclick=()=>{$("#eCountry").value="Nigeria";idFields();$("#eName").value="Amina B. Bello";$("#id_nin").value="35718204961";$("#id_bvn").value="22198457310";$("#ePhone").value="0809 444 0001";$("#eProject").value="P02";toast("Filled with an existing farmer's NIN/BVN — press Verify & Enrol")};
+$("#fillNew").onclick=()=>{$("#eCountry").value="Nigeria";idFields();$("#eName").value="Hadiza Sule";$("#id_nin").value=String(Math.floor(1e10+Math.random()*9e10));$("#id_bvn").value="22"+String(Math.floor(1e8+Math.random()*9e8));$("#ePhone").value="0814 "+Math.floor(100+Math.random()*900)+" "+Math.floor(1000+Math.random()*9000);$("#eProject").value="P08";toast("Filled with a new farmer — press Verify & Enrol")};
+$("#enrolForm").onsubmit=e=>{e.preventDefault();
+const country=$("#eCountry").value,c=countries[country],name=$("#eName").value.trim(),phone=$("#ePhone").value.trim(),proj=$("#eProject").value;
+const idv={};c.ids.forEach(([l,k])=>idv[k]=$("#id_"+k).value.replace(/\s/g,""));
+const steps=[];let fail=null;
+for(const[l,k]of c.ids){const v=idv[k];if((k==="nin"||k==="bvn")&&!/^\d{11}$/.test(v)){fail=`${l} must be exactly 11 digits.`;break}if(k==="nid"&&v.length<6){fail=`${l} looks too short.`;break}}
+steps.push([!fail,"ID format valid"]);
+if(!fail)steps.push([true,"Confirmed with national ID database (simulated) — name matches"]);
+let match=null,on="";
+if(!fail){const keys=Object.entries(idv).map(([k,v])=>k+":"+hash(v)),pk=hash(phone.replace(/\D/g,"").slice(-10));
+for(const f of farmers){const hit=f.keys.filter(x=>keys.includes(x));if(hit.length){match=f;on=hit.map(x=>x.split(":")[0].toUpperCase()).join(" + ").replace("NID","National ID");break}if(f.phoneKey===pk){match=f;on="Phone number";break}}
+steps.push([!match,match?`Duplicate found in registry (matched on ${on})`:"No match in registry — this person is new"]);
+if(!match)steps.push([true,"Phone number not linked to another farmer"]);}
+const li=steps.map(([ok,t])=>`<li><span>${ok?"✅":"⛔"}</span><span>${t}</span></li>`).join("");
+const r=$("#enrolResult");
+if(fail){r.className="box bad";r.innerHTML=`<b>Check the details</b><ul class="checks">${li}<li><span>⛔</span><span>${fail}</span></li></ul>`;return}
+if(match){
+blocked++;
+r.className="box bad";r.innerHTML=`<b>Enrolment blocked — this person already has an account.</b><ul class="checks">${li}</ul><div class="kv"><span>Existing Farmer ID</span><span class="mono">${match.fid}</span><span>Registered name</span><span>${match.name}</span><span>Current project</span><span>${projName(match.proj)}</span><span>Credit score</span><span>${score(match)} (${band(score(match))[0]})</span></div><p class="note" style="margin-bottom:0">To join a new project, the farmer is linked using their existing ID, so their credit history comes with them. The attempt is logged.</p>`;
+renderStats();toast("Duplicate blocked and logged");return}
+const f=addFarmer({name,country,idv,phone,proj,h:{repay:0,seasons:0,yield:0,train:0},status:"Verified",prof:{region:"—",area:"—",size:"Not yet mapped",coop:"Not yet recorded",sex:"—",since:"Today"},docs:Object.fromEntries(DOCS.map(d=>[d.k,"M"]))});
+const p=projects.find(x=>x.id===proj);p.farmers++;
+r.className="box ok";r.innerHTML=`<b>Farmer verified and enrolled.</b><ul class="checks">${li}</ul><div class="kv"><span>New Farmer ID</span><span class="mono"><b>${f.fid}</b></span><span>Stored ID fingerprint</span><span class="mono">${f.keys.map(k=>k.split(":")[1]).join(" · ")}</span><span>Starting score</span><span>${score(f)}, rises as documents are verified and seasons completed</span></div><button class="btn" style="margin-top:12px" type="button" onclick="openProfile('${f.fid}')">Open profile &amp; add documents</button><p class="note" style="margin-bottom:0">Try enrolling the same NIN again — it will be blocked.</p>`;
+renderStats();renderProjects();renderFarmers();toast("Enrolled as "+f.fid);
+};
+}
+/* ---------- PROFILE ---------- */
+function bindProfiles(sel){$$(sel+" [data-p]").forEach(r=>r.onclick=()=>openProfile(r.dataset.p))}
+function history(f){const p=projects.find(x=>x.id===f.proj),loan=LOANS[p.crop]||300000,out=[];
+for(let k=0;k<f.h.seasons;k++){const r=Math.min(1,f.h.repay+(f.h.repay<1?(k%2?.02:-.02):0)),paid=Math.round(loan*r/1000)*1000;
+out.push({season:(2025-k)+" season",loan,paid,st:r>=.98?["Repaid in full","p-g"]:r>=.85?["Mostly repaid","p-b"]:r>=.7?["Repaid late","p-a"]:["Partly repaid","p-r"]})}
+return out}
+const DST={V:["Verified","p-g"],P:["Uploaded, awaiting check","p-a"],M:["Not provided","p-n"]};
+function openProfile(fid){const f=farmers.find(x=>x.fid===fid);if(!f)return;
+const s=score(f),b=band(s),pp=parts(f),hist=history(f),ini=f.name.split(" ").map(w=>w[0]).slice(0,2).join(""),earned=Math.round(docScore(f)*100);
+const p=projects.find(x=>x.id===f.proj);
+$("#panel").innerHTML=`<div class="ph"><div class="av">${ini}</div><div><h3>${f.name}</h3><div class="note mono">${f.fid}</div><div class="row" style="margin-top:6px"><span class="pill p-g">${f.status}</span><span class="pill ${b[1]}">${s} · ${b[0]}</span></div></div><button class="x" onclick="closeProfile()" aria-label="Close">×</button></div>
+<div class="pb">
+<div class="card"><h4>Personal details</h4><div class="kv"><span>Sex</span><span>${f.prof.sex}</span><span>Country</span><span>${f.country}</span><span>State / region</span><span>${f.prof.region}</span><span>LGA / district</span><span>${f.prof.area}</span><span>Phone</span><span class="mono">${mask(f.phone.replace(/\D/g,""))}</span><span>Identity</span><span class="mono">${idMasked(f)}</span><span>Enrolled since</span><span>${f.prof.since}</span></div></div>
+<div class="card"><h4>Farm</h4><div class="kv"><span>Crop / value chain</span><span>${p.crop}</span><span>Farm size</span><span>${f.prof.size}</span><span>Cooperative</span><span>${f.prof.coop}</span><span>Current project</span><span>${p.name}</span><span>Location</span><span>${p.loc}, ${p.country}</span></div></div>
+<div class="card"><h4>How this score was calculated</h4><div class="row" style="margin-bottom:6px"><span class="score">${s}</span><span class="pill ${b[1]}">${b[0]}</span></div>
+${pp.map(x=>`<div style="margin:10px 0"><div class="row" style="justify-content:space-between;font-size:12.5px"><span>${x[0]} <span class="note">(weight ${x[2]}%)</span></span><b>+${Math.round(550*x[1]*x[2]/100)} pts</b></div><div class="bar" style="margin-top:5px"><i style="width:${x[1]*100}%"></i></div></div>`).join("")}
+<div class="box info" style="font-size:12.5px">300 starting points + ${pp.map(x=>Math.round(550*x[1]*x[2]/100)).join(" + ")} = <b>${s}</b> (parts may differ by 1 from rounding).</div></div>
+<div class="card"><h4>Documents provided <span class="note">(${earned} of 100 document points)</span></h4>
+${DOCS.map(d=>{const st=f.docs[d.k];return `<div class="doc"><div class="di">${d.ic}</div><div class="dt"><b>${d.n}</b><span>${d.w}</span><div style="margin-top:4px"><span class="pill ${DST[st][1]}">${DST[st][0]}</span></div></div><div class="pts">${st==="V"?"+"+d.pts:"0"}/${d.pts}<div style="margin-top:6px">${st==="M"?`<button class="btn ghost sm" onclick="docAct('${f.fid}','${d.k}','P')">Upload</button>`:st==="P"?`<button class="btn sm" onclick="docAct('${f.fid}','${d.k}','V')">Verify</button>`:""}</div></div></div>`}).join("")}
+<p class="note" style="margin:10px 0 0">Upload marks a document as received. An officer then checks it against the original and taps Verify; only then do its points count.</p></div>
+<div class="card"><h4>Season history</h4>${hist.length?`<div class="tbl"><table><thead><tr><th>Season</th><th class="num">Input loan</th><th class="num">Repaid</th><th>Outcome</th></tr></thead><tbody>${hist.map(r=>`<tr><td>${r.season}</td><td class="num">${naira(r.loan)}</td><td class="num">${naira(r.paid)}</td><td><span class="pill ${r.st[1]}">${r.st[0]}</span></td></tr>`).join("")}</tbody></table></div>`:'<p class="note" style="margin:0">No seasons completed yet. History starts after the first harvest.</p>'}</div>
+</div>`;
+$("#ov").classList.add("show");$("#panel").scrollTop=0}
+function closeProfile(){$("#ov").classList.remove("show")}
+function docAct(fid,k,to){const f=farmers.find(x=>x.fid===fid),before=score(f);f.docs[k]=to;const sc=$("#panel").scrollTop;openProfile(fid);$("#panel").scrollTop=sc;
+renderFarmers();if(selCred)renderCredit();
+toast(to==="P"?"Document uploaded. Waiting for officer check.":`Document verified. Score ${before} → ${score(f)}`)}
+$("#ov").onclick=e=>{if(e.target.id==="ov")closeProfile()};
+/* ---------- ROUTING ---------- */
+const titles={overview:"Dashboard",projects:"Projects",farmers:"Farmers",enrol:"Enrol & Verify Farmer",credit:"Credit Scores",map:"Farmer Map"};
+function route(){
+const v=(location.hash||"#overview").slice(1);const key=titles[v]?v:"overview";
+$$(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+key));
+$$(".nav a").forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+key));
+$("#crumb").textContent=titles[key];
+if(key==="credit")renderCredit();
+if(key==="farmers")renderFarmers();
+if(key==="map")renderMap();
+closeMenu();closeProfile();window.scrollTo(0,0);
+}
+function closeMenu(){$("#side").classList.remove("open");$("#scrim").classList.remove("show")}
+$("#menuBtn").onclick=()=>{$("#side").classList.add("open");$("#scrim").classList.add("show")};
+$("#scrim").onclick=closeMenu;
+$("#fCountry").innerHTML=`<option value="">All countries</option>`+[...new Set(projects.map(p=>p.country))].map(c=>`<option>${c}</option>`).join("");
+$("#fCountry").onchange=renderProjects;$("#fStatus").onchange=renderProjects;$("#fSearch").oninput=renderFarmers;
+renderStats();renderProjects();renderFarmers();setupEnrol();
+window.addEventListener("hashchange",route);route();
+</script>
+</body>
+</html>
